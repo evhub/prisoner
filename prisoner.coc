@@ -1,0 +1,76 @@
+# Bots:
+
+cooperate(opp_hist=None, self_hist=None, opp_func=None) = True
+defect(opp_hist=None, self_hist=None, opp_func=None) = False
+
+def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
+    if not opp_hist:
+        return cooperate()
+    else:
+        return opp_hist[-1]
+
+def nice_switcher(opp_hist, self_hist, opp_func=None):
+    if not opp_hist:
+        return cooperate()
+    elif self_hist[-1] == opp_hist[-1]:
+        return cooperate()
+    else:
+        return defect()
+
+def mean_switcher(opp_hist, self_hist, opp_func=None):
+    if not opp_hist:
+        return defect()
+    elif self_hist[-1] == opp_hist[-1]:
+        return cooperate()
+    else:
+        return defect()
+
+def tft_mirror(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, tit_for_tat)
+
+def true_mirror(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, opp_func)
+
+def punisher(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, cooperate)
+
+# Game:
+
+def move(a, b, a_hist, b_hist):
+    try:
+        a_c = bool(a(list(b_hist), list(a_hist), b))
+    except RuntimeError:
+        a_c = False
+    try:
+        b_c = bool(b(list(a_hist), list(b_hist), a))
+    except RuntimeError:
+        b_c = False
+    return a_c, b_c
+
+def game(a, b):
+    a_hist = []
+    b_hist = []
+    while True:
+        a_c, b_c = move(a, b, a_hist, b_hist)
+        a_hist.append(a_c)
+        b_hist.append(b_c)
+        yield a_c, b_c
+
+def score(a_c, b_c):
+    if a_c and b_c:
+        return (2, 2)
+    elif a_c:
+        return (0, 3)
+    elif b_c:
+        return (3, 0)
+    else:
+        return (1, 1)
+
+def tally(a, b):
+    a_score = 0
+    b_score = 0
+    for a_c, b_c in game(a, b):
+        a_change, b_change = score(a_c, b_c)
+        a_score += a_change
+        b_score += b_change
+        yield (a_score, b_score)
