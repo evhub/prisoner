@@ -1,0 +1,36 @@
+cooperate(opp_hist=None, self_hist=None, opp_func=None) = True
+defect(opp_hist=None, self_hist=None, opp_func=None) = False
+
+def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
+    if not opp_hist:
+        return cooperate()
+    else:
+        return opp_hist[-1]
+
+def nice_switcher(opp_hist, self_hist, opp_func=None):
+    if not opp_hist:
+        return cooperate()
+    elif self_hist[-1] == opp_hist[-1]:
+        return cooperate()
+    else:
+        return defect()
+
+def mean_switcher(opp_hist, self_hist, opp_func=None):
+    if not opp_hist:
+        return defect()
+    elif self_hist[-1] == opp_hist[-1]:
+        return cooperate()
+    else:
+        return defect()
+
+def tft_mirror(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, tit_for_tat)
+
+def true_mirror(opp_hist, self_hist, opp_func):
+    try:
+        return opp_func(opp_hist, self_hist, true_mirror)
+    except RuntimeError:
+        return tit_for_tat(opp_hist, self_hist, opp_func)
+
+def punisher(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, cooperate)
