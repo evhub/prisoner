@@ -14,11 +14,14 @@ except AttributeError:
 else:
     signal.signal(signal.SIGALRM, timeout)
 
-def time_limit(func, default=timeout, time=.1):
+default_time = 1
+entire_time = 2
+
+def time_limit(func, default=timeout, time=default_time):
     signal.alarm(time)
     try:
         result = func()
-    except TimeOut:
+    except (TimeOut, RuntimeError):
         returned = False
     else:
         returned = True
@@ -29,12 +32,12 @@ def time_limit(func, default=timeout, time=.1):
     else:
         return default()
 
-def move(a, b, a_hist, b_hist, time=1):
+def move(a, b, a_hist, b_hist, time=entire_time):
     return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, time),
             time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, time)
             )
 
-def game(a, b, a_hist=None, b_hist=None, time=1):
+def game(a, b, a_hist=None, b_hist=None, time=entire_time):
     if a_hist is None:
         a_hist = []
     else:
@@ -64,7 +67,7 @@ def score(a_c, b_c, payoffs=min_payoffs):
     else:
         return payoffs[3]
 
-def tally(a, b, a_hist=None, b_hist=None, time=1, payoffs=min_payoffs):
+def tally(a, b, a_hist=None, b_hist=None, time=entire_time, payoffs=min_payoffs):
     a_score = 0
     b_score = 0
     for a_c, b_c in game(a, b, a_hist, b_hist, time):
@@ -79,13 +82,13 @@ def predict(self_func, opp_hist, self_hist, opp_func):
             opp_func(opp_hist+[False], self_hist+[opp_move], self_func)
             )
 
-def simulate(rounds, self_func, opp_hist, self_hist, opp_func, time=.1):
+def simulate(rounds, self_func, opp_hist, self_hist, opp_func, time=default_time):
     opp_move = opp_func(opp_hist, self_hist, self_func)
     return (tally(self_func, opp_func, self_hist+[True], opp_hist+[opp_move], time)$[rounds],
             tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move], time)$[rounds]
             )
 
-def round_robin(rounds, participants, time=1, payoffs=min_payoffs):
+def round_robin(rounds, participants, time=entire_time, payoffs=min_payoffs):
     scores = {}
     for participant in participants:
         scores[participant] = 0
