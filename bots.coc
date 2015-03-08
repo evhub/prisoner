@@ -12,6 +12,8 @@ def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
     else:
         return opp_hist[-1]
 
+def punisher(opp_hist, self_hist=None, opp_func=None):
+
 def nice_switcher(opp_hist, self_hist, opp_func=None):
     if not opp_hist or not self_hist:
         return cooperate()
@@ -27,9 +29,6 @@ def mean_switcher(opp_hist, self_hist, opp_func=None):
         return cooperate()
     else:
         return defect()
-
-def punisher(opp_hist, self_hist, opp_func):
-    return opp_func(opp_hist, self_hist, cooperate)
 
 def mirror_or_tft(opp_hist, self_hist, opp_func):
     try:
