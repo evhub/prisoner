@@ -1,5 +1,5 @@
 import itertools
-import threading
+import signal
 
 class TimeOut(Exception):
     pass
@@ -7,21 +7,25 @@ class TimeOut(Exception):
 def timeout():
     raise TimeOut()
 
+try:
+    signal.SIGALRM
+except AttributeError:
+    raise OSError("system does not support signal.SIGALRM")
+else:
+    signal.signal(signal.SIGALRM, timeout)
+
 def time_limit(func, default=timeout, time=.1):
-    class runner(threading.Thread):
-        result = None
-        returned = False
-        def run(self):
-            self.result = func()
-            self.returned = True
-    thread = runner()
+    signal.alarm(time)
     try:
-        thread.start()
-        thread.join(time)
-    except:
-        pass
-    if thread.returned:
-        return thread.result
+        result = func()
+    except TimeOut:
+        returned = False
+    else:
+        returned = True
+    finally:
+        signal.alarm(0)
+    if returned:
+        return result
     else:
         return default()
 
@@ -81,12 +85,12 @@ def simulate(rounds, self_func, opp_hist, self_hist, opp_func, time=.1):
             tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move], time)$[rounds]
             )
 
-def round_robin(rounds, participants, payoffs=min_payoffs):
+def round_robin(rounds, participants, time=1, payoffs=min_payoffs):
     scores = {}
     for participant in participants:
         scores[participant] = 0
     for a,b in itertools.permutations(participants.keys(), 2):
-        a_score, b_score = tally(participants[a], participants[b], payoffs=payoffs)$[rounds]
+        a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs)$[rounds]
         scores[a] += a_score
         scores[b] += b_score
     return scores
