@@ -2,8 +2,7 @@ import sys
 import os.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import dilemma
-import bots
+from prisoner import dilemma, bots
 
 all_bots = {
     "cooperate": bots.cooperate,
@@ -21,4 +20,4 @@ all_bots = {
 }
 
 if __name__ == "__main__":
-    print(dilemma.round_robin(100, all_bots))
+    print(dilemma.round_robin(10, all_bots))

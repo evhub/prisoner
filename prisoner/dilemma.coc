@@ -12,8 +12,12 @@ def time_limit(func, default=None, time=.1):
             self.result = func()
             self.returned = True
     thread = runner()
-    thread.start()
-    thread.join(time)
+    try:
+        thread.start()
+    except:
+        pass
+    else:
+        thread.join(time)
     if thread.returned:
         return thread.result
     elif default is None:
@@ -21,12 +25,12 @@ def time_limit(func, default=None, time=.1):
     else:
         return default()
 
-def move(a, b, a_hist, b_hist):
-    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, 1),
-            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, 1)
+def move(a, b, a_hist, b_hist, time=1):
+    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, time),
+            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, time)
             )
 
-def game(a, b, a_hist=None, b_hist=None):
+def game(a, b, a_hist=None, b_hist=None, time=1):
     if a_hist is None:
         a_hist = []
     else:
@@ -36,7 +40,7 @@ def game(a, b, a_hist=None, b_hist=None):
     else:
         b_hist = list(b_hist)
     while True:
-        a_c, b_c = move(a, b, a_hist, b_hist)
+        a_c, b_c = move(a, b, a_hist, b_hist, time)
         a_hist.append(a_c)
         b_hist.append(b_c)
         yield a_c, b_c
@@ -56,10 +60,10 @@ def score(a_c, b_c, payoffs=min_payoffs):
     else:
         return payoffs[3]
 
-def tally(a, b, a_hist=None, b_hist=None, payoffs=min_payoffs):
+def tally(a, b, a_hist=None, b_hist=None, time=1, payoffs=min_payoffs):
     a_score = 0
     b_score = 0
-    for a_c, b_c in game(a, b, a_hist, b_hist):
+    for a_c, b_c in game(a, b, a_hist, b_hist, time):
         a_change, b_change = score(a_c, b_c, payoffs)
         a_score += a_change
         b_score += b_change
@@ -71,10 +75,10 @@ def predict(self_func, opp_hist, self_hist, opp_func):
             opp_func(opp_hist+[False], self_hist+[opp_move], self_func)
             )
 
-def simulate(rounds, self_func, opp_hist, self_hist, opp_func):
+def simulate(rounds, self_func, opp_hist, self_hist, opp_func, time=.1):
     opp_move = opp_func(opp_hist, self_hist, self_func)
-    return (tally(self_func, opp_func, self_hist+[True], opp_hist+[opp_move])$[rounds],
-            tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move])$[rounds]
+    return (tally(self_func, opp_func, self_hist+[True], opp_hist+[opp_move], time)$[rounds],
+            tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move], time)$[rounds]
             )
 
 def round_robin(rounds, participants, payoffs=min_payoffs):

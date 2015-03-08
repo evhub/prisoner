@@ -1,4 +1,4 @@
-import prisoner
+from . import dilemma
 import random
 
 cooperate(opp_hist=None, self_hist=None, opp_func=None) = True
@@ -45,23 +45,23 @@ def justice_mirror(opp_hist, self_hist, opp_func):
     return opp_func(opp_hist, self_hist, cooperate)
 
 def mirror_or_tft(opp_hist, self_hist, opp_func):
-    return prisoner.time_limit(()->opp_func(opp_hist, self_hist, mirror_or_tft), ()->tit_for_tat(opp_hist, self_hist, opp_func))
+    return dilemma.time_limit(()->opp_func(opp_hist, self_hist, mirror_or_tft), ()->tit_for_tat(opp_hist, self_hist, opp_func))
 
 def predict_or_tft(opp_hist, self_hist, opp_func):
     try:
-        c_response, d_response = prisoner.time_limit(()->prisoner.predict(predict_or_tft, opp_hist, self_hist, opp_func))
+        c_response, d_response = dilemma.time_limit(()->dilemma.predict(predict_or_tft, opp_hist, self_hist, opp_func))
         if d_response:
             return defect()
         elif c_response:
             return cooperate()
         else:
             return defect()
-    except prisoner.TimeOut:
+    except dilemma.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
 
 def simulate_or_tft(opp_hist, self_hist, opp_func):
     try:
-        c_simulation, d_simulation = prisoner.time_limit(()->prisoner.simulate(4, tit_for_tat, opp_hist, self_hist, opp_func), time=.5)
+        c_simulation, d_simulation = dilemma.time_limit(()->dilemma.simulate(1, tit_for_tat, opp_hist, self_hist, opp_func))
         return c_simulation[0] >= d_simulation[0]
-    except prisoner.TimeOut:
+    except dilemma.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
