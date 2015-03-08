@@ -81,15 +81,15 @@ def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=min_payoffs):
         b_score += b_change
         yield (a_score, b_score)
 
-def predict(self_func, opp_hist, self_hist, opp_bot):
-    opp_move = opp_bot(opp_hist, self_hist, self_func)
-    return (opp_bot(opp_hist+(True,), self_hist+[opp_move], self_func),
-            opp_bot(opp_hist+(False,), self_hist+[opp_move], self_func))
+def predict(opp_bot, opp_hist, self_bot, self_hist):
+    opp_move = opp_bot(opp_hist, self_hist, self_bot)
+    return (opp_bot(opp_hist+(True,), self_hist+[opp_move], self_bot),
+            opp_bot(opp_hist+(False,), self_hist+[opp_move], self_bot))
 
-def simulate(rounds, self_func, opp_hist, self_hist, opp_bot):
-    opp_move = opp_bot(opp_hist, self_hist, self_func)
-    return (tally(self_func, opp_bot, self_hist+(True,), opp_hist+[opp_move], None)$[rounds],
-            tally(self_func, opp_bot, self_hist+(False,), opp_hist+[opp_move], None)$[rounds])
+def simulate(rounds, opp_bot, opp_hist, self_bot, self_hist):
+    opp_move = opp_bot(opp_hist, self_hist, self_bot)
+    return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+[opp_move], None)$[rounds],
+            tally(self_bot, opp_bot, self_hist+(False,), opp_hist+[opp_move], None)$[rounds])
 
 def round_robin(rounds, participants, time=None, payoffs=min_payoffs, verbose=False):
     scores = {}
