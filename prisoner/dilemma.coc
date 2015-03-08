@@ -57,12 +57,12 @@ def game(a, b, a_hist=None, b_hist=None, time=None):
         b_hist.append(b_c)
         yield a_c, b_c
 
-min_payoffs = (
+default_payoffs = (
               (2,2), (0,3),
               (3,0), (1,1)
               )
 
-def score(a_c, b_c, payoffs=min_payoffs):
+def score(a_c, b_c, payoffs=default_payoffs):
     if a_c and b_c:
         return payoffs[0]
     elif a_c:
@@ -72,7 +72,7 @@ def score(a_c, b_c, payoffs=min_payoffs):
     else:
         return payoffs[3]
 
-def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=min_payoffs):
+def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs):
     a_score = 0
     b_score = 0
     for a_c, b_c in game(a, b, a_hist, b_hist, time):
@@ -82,16 +82,16 @@ def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=min_payoffs):
         yield (a_score, b_score)
 
 def predict(opp_bot, opp_hist, self_bot, self_hist):
-    opp_move = opp_bot(opp_hist, self_hist, self_bot)
-    return (opp_bot(opp_hist+(True,), self_hist+[opp_move], self_bot),
-            opp_bot(opp_hist+(False,), self_hist+[opp_move], self_bot))
+    opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
+    return (call(opp_bot, opp_hist+(True,), self_bot, self_hist+(opp_move,)),
+            call(opp_bot, opp_hist+(False,), self_bot, self_hist+(opp_move,)))
 
-def simulate(rounds, opp_bot, opp_hist, self_bot, self_hist):
-    opp_move = opp_bot(opp_hist, self_hist, self_bot)
-    return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+[opp_move], None)$[rounds],
-            tally(self_bot, opp_bot, self_hist+(False,), opp_hist+[opp_move], None)$[rounds])
+def simulate(rounds, opp_bot, opp_hist, self_bot, self_hist, payoffs=default_payoffs):
+    opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
+    return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None, payoffs)$[rounds],
+            tally(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None, payoffs)$[rounds])
 
-def round_robin(rounds, participants, time=None, payoffs=min_payoffs, verbose=False):
+def round_robin(rounds, participants, time=None, payoffs=default_payoffs, verbose=False):
     scores = {}
     for participant in participants:
         scores[participant] = 0

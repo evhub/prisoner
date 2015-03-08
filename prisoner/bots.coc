@@ -51,27 +51,24 @@ def mean_switcher(opp_hist, self_hist, opp_bot=None):
 mean_switcher_bot = (mean_switcher,)
 
 def justice_mirror(opp_hist, self_hist, opp_bot):
-    return dilemma.call(opp_bot, opp_hist, cooperate, self_hist)
+    return dilemma.call(opp_bot, opp_hist, cooperate_bot, self_hist)
 justice_mirror_bot = (justice_mirror,)
 
-def true_mirror(opp_hist, self_hist, opp_bot):
-    return dilemma.call(opp_bot, opp_hist, true_mirror, self_hist)
-true_mirror_bot = (true_mirror,)
-mirror_or_tft_bot = true_mirror_bot + tit_for_tat_bot
+def mirror_or_tft(opp_hist, self_hist, opp_bot):
+    return dilemma.call(opp_bot, opp_hist, mirror_or_tft_bot, self_hist)
+mirror_or_tft_bot = (mirror_or_tft,) + tit_for_tat_bot
 
-def predictor(opp_hist, self_hist, opp_bot):
-    c_response, d_response = dilemma.predict(opp_bot, opp_hist, predictor, self_hist)
+def predict_or_tft(opp_hist, self_hist, opp_bot):
+    c_response, d_response = dilemma.predict(opp_bot, opp_hist, predict_or_tft_bot, self_hist)
     if d_response:
         return defect()
     elif c_response:
         return cooperate()
     else:
         return defect()
-predictor_bot = (predictor,)
-predict_or_tft_bot = predictor_bot + tit_for_tat_bot
+predict_or_tft_bot = (predict_or_tft,) + tit_for_tat_bot
 
-def simulator(opp_hist, self_hist, opp_bot):
-    c_simulation, d_simulation = dilemma.simulate(1, opp_bot, opp_hist, simulator, self_hist)
+def simulate_or_tft(opp_hist, self_hist, opp_bot):
+    c_simulation, d_simulation = dilemma.simulate(1, opp_bot, opp_hist, simulate_or_tft_bot, self_hist)
     return c_simulation[0] >= d_simulation[0]
-simulator_bot = (simulator,)
-simulate_or_tft_bot = simulator_bot + tit_for_tat_bot
+simulate_or_tft_bot = (simulate_or_tft,) + tit_for_tat_bot
