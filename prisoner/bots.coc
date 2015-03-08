@@ -19,7 +19,7 @@ def tit_for_tat(opp_hist, self_hist=None, opp_bot=None):
 tit_for_tat_bot = (tit_for_tat,)
 
 def nice_tft(opp_hist, self_hist=None, opp_bot=None):
-    if not opp_hist or opp_hist[-1] or random.random() < .01:
+    if not opp_hist or opp_hist[-1] or random.random() < .05:
         return cooperate()
     else:
         return defect()
