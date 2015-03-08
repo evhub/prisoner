@@ -69,6 +69,11 @@ def predict_or_tft(opp_hist, self_hist, opp_bot):
 predict_or_tft_bot = (predict_or_tft,) + tit_for_tat_bot
 
 def simulate_or_tft(opp_hist, self_hist, opp_bot):
-    c_simulation, d_simulation = dilemma.simulate(3, opp_bot, opp_hist, simulate_or_tft_bot, self_hist)
-    return c_simulation[0] >= d_simulation[0]
+    c_simulation, d_simulation = dilemma.simulate(3, opp_bot, opp_hist, tit_for_tat_bot, self_hist)
+    if c_simulation[0] > d_simulation[0]:
+        return True
+    elif d_simulation[0] > c_simulation[0]:
+        return False
+    else:
+        return None
 simulate_or_tft_bot = (simulate_or_tft,) + tit_for_tat_bot
