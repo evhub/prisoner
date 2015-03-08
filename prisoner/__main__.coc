@@ -20,4 +20,4 @@ all_bots = {
 }
 
 if __name__ == "__main__":
-    print(dilemma.round_robin(9, all_bots, 5, verbose=True))
+    print(dilemma.score_repr(dilemma.round_robin(100, all_bots, 5)))

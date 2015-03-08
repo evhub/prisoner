@@ -87,20 +87,29 @@ def predict(opp_bot, opp_hist, self_bot, self_hist):
             call(opp_bot, opp_hist+(False,), self_bot, self_hist+(opp_move,)))
 
 def simulate(rounds, opp_bot, opp_hist, self_bot, self_hist, payoffs=default_payoffs):
-    opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
-    return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None, payoffs)$[rounds],
-            tally(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None, payoffs)$[rounds])
+    if rounds > 0:
+        opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
+        return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None, payoffs)$[rounds-1],
+                tally(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None, payoffs)$[rounds-1])
+    else:
+        raise ValueError("rounds must be > 0")
 
-def round_robin(rounds, participants, time=None, payoffs=default_payoffs, verbose=False):
-    scores = {}
-    for participant in participants:
-        scores[participant] = 0
-    for a,b in itertools.permutations(participants.keys(), 2):
-        if verbose:
-            print(repr(a)+" vs. "+repr(b))
-        a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs)$[rounds]
-        if verbose:
-            print("["+str(a_score)+"] ["+str(b_score)+"]")
-        scores[a] += a_score
-        scores[b] += b_score
-    return scores
+def round_robin(rounds, participants, time=None, payoffs=default_payoffs):
+    if rounds > 0:
+        scores = {}
+        for participant in participants:
+            scores[participant] = 0
+        for a,b in itertools.permutations(participants.keys(), 2):
+            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs)$[rounds-1]
+            scores[a] += a_score
+            scores[b] += b_score
+        return scores
+    else:
+        raise ValueError("rounds must be > 0")
+
+def score_repr(scores):
+    out = ["{"]
+    for name, score in reversed(sorted(scores.items(), key=(item)->(item[1]))):
+        out.append("    "+name+": "+str(score))
+    out.append("}")
+    return "\n".join(out)
