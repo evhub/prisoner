@@ -4,7 +4,7 @@ import threading
 class TimeOut(Exception):
     pass
 
-def time_limit(func, default=None, time=1):
+def time_limit(func, default=None, time=.1):
     class runner(threading.Thread):
         result = None
         returned = False
@@ -22,8 +22,8 @@ def time_limit(func, default=None, time=1):
         return default()
 
 def move(a, b, a_hist, b_hist):
-    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, 1.1),
-            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, 1.1)
+    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, 1),
+            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, 1)
             )
 
 def game(a, b, a_hist=None, b_hist=None):
