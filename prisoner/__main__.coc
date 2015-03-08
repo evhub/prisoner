@@ -5,19 +5,19 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from prisoner import dilemma, bots
 
 all_bots = {
-    "cooperate": bots.cooperate,
-    "defect": bots.defect,
-    "coin_flip": bots.coin_flip,
-    "tit_for_tat": bots.tit_for_tat,
-    "nice_tft": bots.nice_tft,
-    "punisher": bots.punisher,
-    "nice_switcher": bots.nice_switcher,
-    "mean_switcher": bots.mean_switcher,
-    "justice_mirror": bots.justice_mirror,
-    "mirror_or_tft": bots.mirror_or_tft,
-    "predict_or_tft": bots.predict_or_tft,
-    "simulate_or_tft": bots.simulate_or_tft
+    "cooperate": bots.cooperate_bot,
+    "defect": bots.defect_bot,
+    "coin_flip": bots.coin_flip_bot,
+    "tit_for_tat": bots.tit_for_tat_bot,
+    "nice_tft": bots.nice_tft_bot,
+    "punisher": bots.punisher_bot,
+    "nice_switcher": bots.nice_switcher_bot,
+    "mean_switcher": bots.mean_switcher_bot,
+    "justice_mirror": bots.justice_mirror_bot,
+    "mirror_or_tft": bots.mirror_or_tft_bot,
+    "predict_or_tft": bots.predict_or_tft_bot,
+    "simulate_or_tft": bots.simulate_or_tft_bot
 }
 
 if __name__ == "__main__":
-    print(dilemma.round_robin(10, all_bots))
+    print(dilemma.round_robin(10, all_bots, 5, verbose=True))

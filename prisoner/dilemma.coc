@@ -1,23 +1,17 @@
 import itertools
 import signal
 
-class TimeOut(Exception):
-    pass
-
-def timeout():
-    raise TimeOut()
-
-try:
-    signal.SIGALRM
-except AttributeError:
-    raise OSError("system does not support signal.SIGALRM")
-else:
-    signal.signal(signal.SIGALRM, timeout)
-
-default_time = 1
-entire_time = 2
-
-def time_limit(func, default=timeout, time=default_time):
+def time_limit(func, default, time):
+    class TimeOut(Exception):
+        pass
+    def timeout():
+        raise TimeOut()
+    try:
+        signal.SIGALRM
+    except AttributeError:
+        raise OSError("system does not support signal.SIGALRM")
+    else:
+        signal.signal(signal.SIGALRM, timeout)
     signal.alarm(time)
     try:
         result = func()
@@ -30,14 +24,25 @@ def time_limit(func, default=timeout, time=default_time):
     if returned:
         return result
     else:
-        return default()
+        return default
 
-def move(a, b, a_hist, b_hist, time=entire_time):
-    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, time),
-            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, time)
-            )
+default_move = False
 
-def game(a, b, a_hist=None, b_hist=None, time=entire_time):
+def call(a, a_hist, b, b_hist, time=None):
+    for func in a:
+        if time is None:
+            result = func(b_hist, a_hist, b)
+        else:
+            result = time_limit(func$(b_hist, a_hist, b), None, time)
+        if result is not None:
+            return result
+    return default_move
+
+def moves(a, b, a_hist, b_hist, time=None):
+    return (call(a, a_hist, b, b_hist, time),
+            call(b, b_hist, a, a_hist, time))
+
+def game(a, b, a_hist=None, b_hist=None, time=None):
     if a_hist is None:
         a_hist = []
     else:
@@ -47,7 +52,7 @@ def game(a, b, a_hist=None, b_hist=None, time=entire_time):
     else:
         b_hist = list(b_hist)
     while True:
-        a_c, b_c = move(a, b, a_hist, b_hist, time)
+        a_c, b_c = moves(a, b, tuple(a_hist), tuple(b_hist), time)
         a_hist.append(a_c)
         b_hist.append(b_c)
         yield a_c, b_c
@@ -67,7 +72,7 @@ def score(a_c, b_c, payoffs=min_payoffs):
     else:
         return payoffs[3]
 
-def tally(a, b, a_hist=None, b_hist=None, time=entire_time, payoffs=min_payoffs):
+def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=min_payoffs):
     a_score = 0
     b_score = 0
     for a_c, b_c in game(a, b, a_hist, b_hist, time):
@@ -76,24 +81,26 @@ def tally(a, b, a_hist=None, b_hist=None, time=entire_time, payoffs=min_payoffs)
         b_score += b_change
         yield (a_score, b_score)
 
-def predict(self_func, opp_hist, self_hist, opp_func):
-    opp_move = opp_func(opp_hist, self_hist, self_func)
-    return (opp_func(opp_hist+[True], self_hist+[opp_move], self_func),
-            opp_func(opp_hist+[False], self_hist+[opp_move], self_func)
-            )
+def predict(self_func, opp_hist, self_hist, opp_bot):
+    opp_move = opp_bot(opp_hist, self_hist, self_func)
+    return (opp_bot(opp_hist+(True,), self_hist+[opp_move], self_func),
+            opp_bot(opp_hist+(False,), self_hist+[opp_move], self_func))
 
-def simulate(rounds, self_func, opp_hist, self_hist, opp_func, time=default_time):
-    opp_move = opp_func(opp_hist, self_hist, self_func)
-    return (tally(self_func, opp_func, self_hist+[True], opp_hist+[opp_move], time)$[rounds],
-            tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move], time)$[rounds]
-            )
+def simulate(rounds, self_func, opp_hist, self_hist, opp_bot):
+    opp_move = opp_bot(opp_hist, self_hist, self_func)
+    return (tally(self_func, opp_bot, self_hist+(True,), opp_hist+[opp_move], None)$[rounds],
+            tally(self_func, opp_bot, self_hist+(False,), opp_hist+[opp_move], None)$[rounds])
 
-def round_robin(rounds, participants, time=entire_time, payoffs=min_payoffs):
+def round_robin(rounds, participants, time=None, payoffs=min_payoffs, verbose=False):
     scores = {}
     for participant in participants:
         scores[participant] = 0
     for a,b in itertools.permutations(participants.keys(), 2):
+        if verbose:
+            print(repr(a)+" vs. "+repr(b))
         a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs)$[rounds]
+        if verbose:
+            print("["+str(a_score)+"] ["+str(b_score)+"]")
         scores[a] += a_score
         scores[b] += b_score
     return scores
