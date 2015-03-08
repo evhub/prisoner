@@ -1,38 +1,88 @@
-def move(a, b, a_hist, b_hist):
-    try:
-        a_c = bool(a(list(b_hist), list(a_hist), b))
-    except RuntimeError:
-        a_c = False
-    try:
-        b_c = bool(b(list(a_hist), list(b_hist), a))
-    except RuntimeError:
-        b_c = False
-    return a_c, b_c
+import itertools
+import threading
 
-def game(a, b):
-    a_hist = []
-    b_hist = []
+class TimeOut(Exception):
+    pass
+
+def time_limit(func, default=None, time=1):
+    class runner(threading.Thread):
+        result = None
+        returned = False
+        def run(self):
+            self.result = func()
+            self.returned = True
+    thread = runner()
+    thread.start()
+    thread.join(time)
+    if thread.returned:
+        return thread.result
+    elif default is None:
+        raise TimeOut()
+    else:
+        return default()
+
+def move(a, b, a_hist, b_hist):
+    return (time_limit(()->bool(a(list(b_hist), list(a_hist), b)), ()->False, 1.1),
+            time_limit(()->bool(b(list(a_hist), list(b_hist), a)), ()->False, 1.1)
+            )
+
+def game(a, b, a_hist=None, b_hist=None):
+    if a_hist is None:
+        a_hist = []
+    else:
+        a_hist = list(a_hist)
+    if b_hist is None:
+        b_hist = []
+    else:
+        b_hist = list(b_hist)
     while True:
         a_c, b_c = move(a, b, a_hist, b_hist)
         a_hist.append(a_c)
         b_hist.append(b_c)
         yield a_c, b_c
 
-def score(a_c, b_c):
-    if a_c and b_c:
-        return (2, 2)
-    elif a_c:
-        return (0, 3)
-    elif b_c:
-        return (3, 0)
-    else:
-        return (1, 1)
+min_payoffs = (
+              (2,2), (0,3),
+              (3,0), (1,1)
+              )
 
-def tally(a, b):
+def score(a_c, b_c, payoffs=min_payoffs):
+    if a_c and b_c:
+        return payoffs[0]
+    elif a_c:
+        return payoffs[1]
+    elif b_c:
+        return payoffs[2]
+    else:
+        return payoffs[3]
+
+def tally(a, b, a_hist=None, b_hist=None, payoffs=min_payoffs):
     a_score = 0
     b_score = 0
-    for a_c, b_c in game(a, b):
-        a_change, b_change = score(a_c, b_c)
+    for a_c, b_c in game(a, b, a_hist, b_hist):
+        a_change, b_change = score(a_c, b_c, payoffs)
         a_score += a_change
         b_score += b_change
         yield (a_score, b_score)
+
+def predict(self_func, opp_hist, self_hist, opp_func):
+    opp_move = opp_func(opp_hist, self_hist, self_func)
+    return (opp_func(opp_hist+[True], self_hist+[opp_move], self_func),
+            opp_func(opp_hist+[False], self_hist+[opp_move], self_func)
+            )
+
+def simulate(rounds, self_func, opp_hist, self_hist, opp_func):
+    opp_move = opp_func(opp_hist, self_hist, self_func)
+    return (tally(self_func, opp_func, self_hist+[True], opp_hist+[opp_move])$[rounds],
+            tally(self_func, opp_func, self_hist+[False], opp_hist+[opp_move])$[rounds]
+            )
+
+def round_robin(rounds, participants, payoffs=min_payoffs):
+    scores = {}
+    for participant in participants:
+        scores[participant] = 0
+    for a,b in itertools.permutations(participants.keys(), 2):
+        a_score, b_score = tally(participants[a], participants[b], payoffs=payoffs)$[rounds]
+        scores[a] += a_score
+        scores[b] += b_score
+    return scores

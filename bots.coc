@@ -1,3 +1,4 @@
+import prisoner
 import random
 
 cooperate(opp_hist=None, self_hist=None, opp_func=None) = True
@@ -12,7 +13,17 @@ def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
     else:
         return opp_hist[-1]
 
+def nice_tft(opp_hist, self_hist=None, opp_func=None):
+    if not opp_hist or opp_hist[-1] or random.random() < .01:
+        return cooperate()
+    else:
+        return defect()
+
 def punisher(opp_hist, self_hist=None, opp_func=None):
+    if not opp_hist:
+        return cooperate()
+    else:
+        return reduce((and), opp_hist)
 
 def nice_switcher(opp_hist, self_hist, opp_func=None):
     if not opp_hist or not self_hist:
@@ -30,20 +41,27 @@ def mean_switcher(opp_hist, self_hist, opp_func=None):
     else:
         return defect()
 
+def justice_mirror(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, cooperate)
+
 def mirror_or_tft(opp_hist, self_hist, opp_func):
+    return prisoner.time_limit(()->opp_func(opp_hist, self_hist, mirror_or_tft), ()->tit_for_tat(opp_hist, self_hist, opp_func))
+
+def predict_or_tft(opp_hist, self_hist, opp_func):
     try:
-        return opp_func(opp_hist, self_hist, mirror_or_tft)
-    except RuntimeError:
+        c_response, d_response = prisoner.time_limit(()->prisoner.predict(predict_or_tft, opp_hist, self_hist, opp_func))
+        if d_response:
+            return defect()
+        elif c_response:
+            return cooperate()
+        else:
+            return defect()
+    except prisoner.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
 
-def simulate_or_tft(opp_hist, self_hist, opp_func):
+def simulate10_or_tft(opp_hist, self_hist, opp_func):
     try:
-        opp_move = opp_func(opp_hist, self_hist, simulate_or_tft)
-        if opp_func(opp_hist+[False], self_hist+[opp_move], simulate_or_tft):
-            return False
-        elif opp_func(opp_hist+[True], self_hist+[opp_move], simulate_or_tft):
-            return True
-        else:
-            return False
-    except RuntimeError:
+        c_simulation, d_simulation = prisoner.time_limit(()->prisoner.simulate(10, tit_for_tat, opp_hist, self_hist, opp_func))
+        return c_simulation[0] >= d_simulation[0]
+    except prisoner.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
