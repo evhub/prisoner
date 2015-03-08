@@ -1,5 +1,10 @@
+import random
+
 cooperate(opp_hist=None, self_hist=None, opp_func=None) = True
 defect(opp_hist=None, self_hist=None, opp_func=None) = False
+
+def coin_flip(opp_hist=None, self_hist=None, opp_func=None):
+    return bool(random.getrandbits(1))
 
 def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
     if not opp_hist:
@@ -8,7 +13,7 @@ def tit_for_tat(opp_hist, self_hist=None, opp_func=None):
         return opp_hist[-1]
 
 def nice_switcher(opp_hist, self_hist, opp_func=None):
-    if not opp_hist:
+    if not opp_hist or not self_hist:
         return cooperate()
     elif self_hist[-1] == opp_hist[-1]:
         return cooperate()
@@ -16,21 +21,30 @@ def nice_switcher(opp_hist, self_hist, opp_func=None):
         return defect()
 
 def mean_switcher(opp_hist, self_hist, opp_func=None):
-    if not opp_hist:
+    if not opp_hist or not self_hist:
         return defect()
     elif self_hist[-1] == opp_hist[-1]:
         return cooperate()
     else:
         return defect()
 
-def tft_mirror(opp_hist, self_hist, opp_func):
-    return opp_func(opp_hist, self_hist, tit_for_tat)
+def punisher(opp_hist, self_hist, opp_func):
+    return opp_func(opp_hist, self_hist, cooperate)
 
-def true_mirror(opp_hist, self_hist, opp_func):
+def mirror_or_tft(opp_hist, self_hist, opp_func):
     try:
-        return opp_func(opp_hist, self_hist, true_mirror)
+        return opp_func(opp_hist, self_hist, mirror_or_tft)
     except RuntimeError:
         return tit_for_tat(opp_hist, self_hist, opp_func)
 
-def punisher(opp_hist, self_hist, opp_func):
-    return opp_func(opp_hist, self_hist, cooperate)
+def simulate_or_tft(opp_hist, self_hist, opp_func):
+    try:
+        opp_move = opp_func(opp_hist, self_hist, simulate_or_tft)
+        if opp_func(opp_hist+[False], self_hist+[opp_move], simulate_or_tft):
+            return False
+        elif opp_func(opp_hist+[True], self_hist+[opp_move], simulate_or_tft):
+            return True
+        else:
+            return False
+    except RuntimeError:
+        return tit_for_tat(opp_hist, self_hist, opp_func)
