@@ -1,0 +1,24 @@
+import sys
+import os.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import dilemma
+import bots
+
+all_bots = {
+    "cooperate": bots.cooperate,
+    "defect": bots.defect,
+    "coin_flip": bots.coin_flip,
+    "tit_for_tat": bots.tit_for_tat,
+    "nice_tft": bots.nice_tft,
+    "punisher": bots.punisher,
+    "nice_switcher": bots.nice_switcher,
+    "mean_switcher": bots.mean_switcher,
+    "justice_mirror": bots.justice_mirror,
+    "mirror_or_tft": bots.mirror_or_tft,
+    "predict_or_tft": bots.predict_or_tft,
+    "simulate_or_tft": bots.simulate_or_tft
+}
+
+if __name__ == "__main__":
+    print(dilemma.round_robin(100, all_bots))

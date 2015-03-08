@@ -59,9 +59,9 @@ def predict_or_tft(opp_hist, self_hist, opp_func):
     except prisoner.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
 
-def simulate10_or_tft(opp_hist, self_hist, opp_func):
+def simulate_or_tft(opp_hist, self_hist, opp_func):
     try:
-        c_simulation, d_simulation = prisoner.time_limit(()->prisoner.simulate(10, tit_for_tat, opp_hist, self_hist, opp_func))
+        c_simulation, d_simulation = prisoner.time_limit(()->prisoner.simulate(4, tit_for_tat, opp_hist, self_hist, opp_func), time=.5)
         return c_simulation[0] >= d_simulation[0]
     except prisoner.TimeOut:
         return tit_for_tat(opp_hist, self_hist, opp_func)
