@@ -4,7 +4,10 @@ import threading
 class TimeOut(Exception):
     pass
 
-def time_limit(func, default=None, time=.1):
+def timeout():
+    raise TimeOut()
+
+def time_limit(func, default=timeout, time=.1):
     class runner(threading.Thread):
         result = None
         returned = False
@@ -14,14 +17,11 @@ def time_limit(func, default=None, time=.1):
     thread = runner()
     try:
         thread.start()
+        thread.join(time)
     except:
         pass
-    else:
-        thread.join(time)
     if thread.returned:
         return thread.result
-    elif default is None:
-        raise TimeOut()
     else:
         return default()
 
