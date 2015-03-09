@@ -81,16 +81,33 @@ def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs):
         b_score += b_change
         yield (a_score, b_score)
 
-def predict(opp_bot, opp_hist, self_bot, self_hist):
+def predict(self_bot, self_hist, opp_bot, opp_hist, move=None):
     opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
-    return (call(opp_bot, opp_hist+(True,), self_bot, self_hist+(opp_move,)),
-            call(opp_bot, opp_hist+(False,), self_bot, self_hist+(opp_move,)))
+    if move is None:
+        return (call(opp_bot, opp_hist+(True,), self_bot, self_hist+(opp_move,)),
+                call(opp_bot, opp_hist+(False,), self_bot, self_hist+(opp_move,)))
+    else:
+        return call(opp_bot, opp_hist+(move,), self_bot, self_hist+(opp_move,))
 
-def simulate(rounds, opp_bot, opp_hist, self_bot, self_hist, payoffs=default_payoffs):
+def winnings(self_bot, self_hist, opp_bot, opp_hist, rounds=1, move=None, payoffs=default_payoffs):
     if rounds > 0:
         opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
-        return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None, payoffs)$[rounds-1],
-                tally(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None, payoffs)$[rounds-1])
+        if move is None:
+            return (tally(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None, payoffs)$[rounds-1],
+                    tally(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None, payoffs)$[rounds-1])
+        else:
+            return tally(self_bot, opp_bot, self_hist+(move,), opp_hist+(opp_move,), None, payoffs)$[rounds-1]
+    else:
+        raise ValueError("rounds must be > 0")
+
+def simulate(self_bot, self_hist, opp_bot, opp_hist, rounds=1, move=None):
+    if rounds > 0:
+        opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
+        if move is None:
+            return (game(self_bot, opp_bot, self_hist+(True,), opp_hist+(opp_move,), None)$[:rounds],
+                    game(self_bot, opp_bot, self_hist+(False,), opp_hist+(opp_move,), None)$[:rounds])
+        else:
+            return game(self_bot, opp_bot, self_hist+(move,), opp_hist+(opp_move,), None)$[:rounds]
     else:
         raise ValueError("rounds must be > 0")
 
@@ -107,9 +124,24 @@ def round_robin(rounds, participants, time=None, payoffs=default_payoffs):
     else:
         raise ValueError("rounds must be > 0")
 
+def score_sort(scores):
+    return sorted(scores.items(), key=(item)->(item[1]))
+
+def tournament(rounds, participants, time=None, payoffs=default_payoffs):
+    while len(participants) > 1:
+        scores = round_robin(rounds, participants, time=time, payoffs=payoffs)
+        yield scores
+        participants = participants.copy()
+        lowest = None
+        for name, score in score_sort(scores):
+            if lowest is None:
+                lowest = score
+            if score == lowest:
+                del participants[name]
+
 def score_repr(scores):
     out = ["{"]
-    for name, score in reversed(sorted(scores.items(), key=(item)->(item[1]))):
+    for name, score in reversed(score_sort(scores)):
         out.append("    "+name+": "+str(score))
     out.append("}")
     return "\n".join(out)

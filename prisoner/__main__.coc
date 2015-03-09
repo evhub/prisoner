@@ -11,8 +11,12 @@ deterministic_bots = {
     "punisher": bots.punisher_bot,
     "nice_switcher": bots.nice_switcher_bot,
     "mean_switcher": bots.mean_switcher_bot,
+    "exploit_or_tft": bots.exploit_or_tft_bot,
+    "exploit_or_switch": bots.exploit_or_switch_bot,
     "justice_mirror": bots.justice_mirror_bot,
     "mirror_or_tft": bots.mirror_or_tft_bot,
+    "tft_or_mirror": bots.tft_or_mirror_bot,
+    "switch_or_mirror": bots.switch_or_mirror_bot,
     "predict_or_tft": bots.predict_or_tft_bot,
     "simulate_or_tft": bots.simulate_or_tft_bot
 }
@@ -24,4 +28,5 @@ all_bots.update({
 })
 
 if __name__ == "__main__":
-    print(dilemma.score_repr(dilemma.round_robin(100, deterministic_bots, 5)))
+    for scores in dilemma.tournament(100, all_bots, 5):
+        print(dilemma.score_repr(scores))
