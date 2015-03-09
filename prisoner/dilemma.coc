@@ -4,7 +4,7 @@ import signal
 def time_limit(func, default, time):
     class TimeOut(Exception):
         pass
-    def timeout():
+    def timeout(*args, **kwargs):
         raise TimeOut()
     try:
         signal.SIGALRM
@@ -16,15 +16,11 @@ def time_limit(func, default, time):
     try:
         result = func()
     except (TimeOut, RuntimeError):
-        returned = False
+        return default
     else:
-        returned = True
+        return result
     finally:
         signal.alarm(0)
-    if returned:
-        return result
-    else:
-        return default
 
 default_move = False
 

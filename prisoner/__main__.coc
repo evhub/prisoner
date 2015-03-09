@@ -18,7 +18,8 @@ deterministic_bots = {
     "tft_or_mirror": bots.tft_or_mirror_bot,
     "switch_or_mirror": bots.switch_or_mirror_bot,
     "predict_or_tft": bots.predict_or_tft_bot,
-    "simulate_or_tft": bots.simulate_or_tft_bot
+    "simulate_or_tft": bots.simulate_or_tft_bot,
+    "nosim_tft": bots.nosim_tft_bot
 }
 
 all_bots = deterministic_bots.copy()
@@ -28,5 +29,5 @@ all_bots.update({
 })
 
 if __name__ == "__main__":
-    for scores in dilemma.tournament(100, all_bots, 5):
+    for scores in dilemma.tournament(10, all_bots, 1):
         print(dilemma.score_repr(scores))
