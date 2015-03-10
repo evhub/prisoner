@@ -25,6 +25,13 @@ def nice_tft(opp_hist, self_hist=None, opp_bot=None):
         return defect()
 nice_tft_bot = (nice_tft,)
 
+def delayed_tft(opp_hist, self_hist=None, opp_bot=None):
+    if opp_hist:
+        return opp_hist[-random.randint(0, len(opp_hist)-1)]
+    else:
+        return None
+delayed_tft_bot = (delayed_tft,) + cooperate_bot
+
 def punisher(opp_hist, self_hist=None, opp_bot=None):
     if opp_hist and not reduce((and), opp_hist):
         return defect()
@@ -52,6 +59,8 @@ def exploiter(opp_hist, self_hist, opp_bot):
 exploit_or_tft_bot = (exploiter,) + tit_for_tat_bot
 exploit_or_switch_bot = (exploiter,) + nice_switcher_bot
 exploit_or_punish_bot = (exploiter,) + punisher_bot
+exploit_or_nice_tft_bot = (exploiter,) + nice_tft_bot
+exploit_or_delayed_tft_bot = (exploiter,) + delayed_tft_bot
 
 def justice_mirror(opp_hist, self_hist, opp_bot):
     return dilemma.call(opp_bot, opp_hist, cooperate_bot, self_hist)
@@ -73,6 +82,14 @@ switch_or_mirror_bot = (switcher,) + (switch_or_mirror,) + cooperate_bot
 def punish_or_mirror(opp_hist, self_hist, opp_bot):
     return dilemma.call(opp_bot, opp_hist, punish_or_mirror_bot, self_hist)
 punish_or_mirror_bot = (punisher,) + (punish_or_mirror,) + cooperate_bot
+
+def nice_tft_or_mirror(opp_hist, self_hist, opp_bot):
+    return dilemma.call(opp_bot, opp_hist, nice_tft_or_mirror_bot, self_hist)
+nice_tft_or_mirror_bot = (nice_tft,) + (nice_tft_or_mirror,) + cooperate_bot
+
+def delayed_tft_or_mirror(opp_hist, self_hist, opp_bot):
+    return dilemma.call(opp_bot, opp_hist, delayed_tft_or_mirror_bot, self_hist)
+delayed_tft_or_mirror_bot = (delayed_tft,) + (delayed_tft_or_mirror,) + cooperate_bot
 
 def lookahead_or_tft(opp_hist, self_hist, opp_bot):
     c_response, d_response = dilemma.simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)

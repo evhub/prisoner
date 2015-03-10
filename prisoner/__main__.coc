@@ -26,7 +26,12 @@ base_bots = {
 
 random_bots = {
     "coin_flip": bots.coin_flip_bot,
-    "nice_tft": bots.nice_tft_bot
+    "nice_tft": bots.nice_tft_bot,
+    "delayed_tft": bots.delayed_tft_bot,
+    "exploit_or_nice_tft": bots.exploit_or_nice_tft_bot,
+    "exploit_or_delayed_tft": bots.exploit_or_delayed_tft_bot,
+    "nice_tft_or_mirror": bots.nice_tft_or_mirror_bot,
+    "delayed_tft_or_mirror": bots.delayed_tft_or_mirror_bot
 }
 
 slow_bots = {
