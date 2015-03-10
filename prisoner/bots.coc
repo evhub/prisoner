@@ -31,7 +31,7 @@ nice_tft_bot = (nice_tft,)
 
 def delayed_tft(opp_hist, self_hist=None, opp_bot=None):
     if opp_hist:
-        return opp_hist[random.randint(0, len(opp_hist)-1)]
+        return random.choice(opp_hist)
     else:
         return None
 delayed_tft_bot = (delayed_tft,) + cooperate_bot
