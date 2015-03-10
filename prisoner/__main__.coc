@@ -1,8 +1,12 @@
+# IMPORTS:
+
 import sys
 import os.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from prisoner import dilemma, bots
+
+# BOT LISTS:
 
 base_bots = {
     "cooperate": bots.cooperate_bot,
@@ -47,6 +51,8 @@ deterministic_bots.update(slow_bots)
 all_bots = base_bots.copy()
 all_bots.update(random_bots)
 all_bots.update(slow_bots)
+
+# MAIN:
 
 if __name__ == "__main__":
     for scores in dilemma.tournament(100, all_bots, 1):

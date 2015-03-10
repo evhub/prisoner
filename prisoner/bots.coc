@@ -1,5 +1,9 @@
+# IMPORTS:
+
 from . import dilemma
 import random
+
+# BOTS:
 
 cooperate(opp_hist=None, self_hist=None, opp_bot=None) = True
 cooperate_bot = (cooperate,)
