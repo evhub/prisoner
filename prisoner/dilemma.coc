@@ -155,5 +155,5 @@ def decide(c_scores, d_scores):
 bot_call(a, a_hist, b_hist, b) = call(a, a_hist, b, b_hist)
 
 def pd_bot(*funcs):
-    bot_funcs = (self_hist, opp_hist, opp_bot) -> func(self_hist, opp_hist, bot_call$(opp_bot) for func in funcs)
+    bot_funcs = (((self_hist, opp_hist, opp_bot) -> func(self_hist, opp_hist, bot_call$(opp_bot)) for func in funcs))
     return tuple(bot_funcs)
