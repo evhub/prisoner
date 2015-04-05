@@ -12,7 +12,7 @@ defect(opp_hist=None, self_hist=None, opp_bot=None) = False
 defect_bot = (defect,)
 
 def coin_flip(opp_hist=None, self_hist=None, opp_bot=None):
-    return bool(random.getrandbits(1))
+    return random.getrandbits(1) |> bool
 coin_flip_bot = (coin_flip,)
 
 def tit_for_tat(opp_hist, self_hist=None, opp_bot=None):
@@ -37,7 +37,7 @@ def delayed_tft(opp_hist, self_hist=None, opp_bot=None):
 delayed_tft_bot = (delayed_tft,) + cooperate_bot
 
 def punisher(opp_hist, self_hist=None, opp_bot=None):
-    if opp_hist and not reduce((and), opp_hist):
+    if opp_hist and not all(opp_hist):
         return defect()
     else:
         return None
