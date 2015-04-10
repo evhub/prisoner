@@ -68,15 +68,15 @@ def time_limit(func, default, time):
     finally:
         signal.alarm(0)
 
-def call(a, a_hist, b, b_hist, time=None):
+def bot_call(a, a_hist, b, b_hist, time=None):
     if isinstance(a, pd_bot) and isinstance(b, pd_bot):
-        return a(tuple(a_hist), tuple(b_hist), b, time)
+        return a(list(a_hist), list(b_hist), b, time)
     else:
         raise TypeError("bots must be pd_bot objects")
 
 def moves(a, b, a_hist, b_hist, time=None):
-    return (call(a, a_hist, b, b_hist, time),
-            call(b, b_hist, a, a_hist, time))
+    return (bot_call(a, a_hist, b, b_hist, time),
+            bot_call(b, b_hist, a, a_hist, time))
 
 def game(a, b, a_hist=None, b_hist=None, time=None):
     if a_hist is None:
@@ -154,12 +154,12 @@ def score_repr(scores):
 
 def simulate(self_bot, self_hist, opp_bot, opp_hist, self_move=None, opp_move=None):
     if opp_move is None:
-        opp_move = call(opp_bot, opp_hist, self_bot, self_hist)
+        opp_move = opp_bot(opp_hist, self_hist, self_bot)
     if self_move is None:
         return (simulate(self_bot, self_hist, opp_bot, opp_hist, True, opp_move),
                 simulate(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
     else:
-        return ((self_move, opp_move),) :: game(self_bot, opp_bot, self_hist+(self_move,), opp_hist+(opp_move,), None)
+        return [self_move, opp_move] :: game(self_bot, opp_bot, self_hist+[self_move], opp_hist+[opp_move], None)
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, self_move=None, payoffs=default_payoffs):
     simulation = simulate(self_bot, self_hist, opp_bot, opp_hist, self_move)
