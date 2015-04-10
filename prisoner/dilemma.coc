@@ -5,12 +5,45 @@ import signal
 
 # DEFAULTS:
 
-default_move = False
-
 default_payoffs = (
                   (2,2), (0,3),
                   (3,0), (1,1)
                   )
+
+# BOT CONSTRUCTOR:
+
+class pd_bot(object):
+    default = False
+
+    def __init__(self, *funcs):
+        self.funcs = tuple(funcs)
+        self.default = default
+
+    def copy(self):
+        out = pd_bot(*self.funcs)
+        out.default = self.default
+        return out
+
+    def __iadd__(self, other):
+        if isinstance(other, pd_bot):
+            self.funcs += other.funcs
+        else:
+            raise TypeError("pd_bot objects can only be added to other pd_bot objects")
+
+    def __add__(self, other):
+        out = self.copy()
+        out += other
+        return out
+
+    def __call__(self, self_hist, opp_hist, opp_bot, time=None):
+        for func in self.funcs:
+            if time is None:
+                result = func(list(self_hist), list(opp_hist), opp_bot)
+            else:
+                result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot), None, time)
+            if result is not None:
+                return result
+        return self.default
 
 # GAME UTILITIES:
 
@@ -36,15 +69,10 @@ def time_limit(func, default, time):
         signal.alarm(0)
 
 def call(a, a_hist, b, b_hist, time=None):
-    a_hist, b_hist = tuple(a_hist), tuple(b_hist)
-    for func in a:
-        if time is None:
-            result = func(b_hist, a_hist, b)
-        else:
-            result = time_limit(func$(b_hist, a_hist, b), None, time)
-        if result is not None:
-            return result
-    return default_move
+    if isinstance(a, pd_bot) and isinstance(b, pd_bot):
+        return a(tuple(a_hist), tuple(b_hist), b, time)
+    else:
+        raise TypeError("bots must be pd_bot objects")
 
 def moves(a, b, a_hist, b_hist, time=None):
     return (call(a, a_hist, b, b_hist, time),
@@ -152,9 +180,3 @@ def decide(c_scores, d_scores):
         return False
     else:
         return None
-
-bot_call(a, a_hist, b_hist, b) = call(a, a_hist, b, b_hist)
-
-def pd_bot(*funcs):
-    bot_funcs = (((self_hist, opp_hist, opp_bot) -> func(list(self_hist), list(opp_hist), bot_call$(opp_bot)) for func in funcs))
-    return tuple(bot_funcs)
