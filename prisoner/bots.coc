@@ -1,6 +1,6 @@
 # IMPORTS:
 
-from . import dilemma
+from .dilemma import pd_bot, simulate, winnings, decide
 import random
 
 # BOTS:
@@ -54,9 +54,9 @@ mean_switcher_bot = pd_bot(switcher)
 nice_switcher_bot = mean_switcher_bot + cooperate_bot
 
 def exploiter(opp_hist, self_hist, opp_bot):
-    if dilemma.simulate(defect_bot, self_hist, opp_bot, opp_hist, False)$[1][1]:
+    if simulate(defect_bot, self_hist, opp_bot, opp_hist, False)$[1][1]:
         return defect()
-    elif not dilemma.simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True)$[1][1]:
+    elif not simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True)$[1][1]:
         return defect()
     else:
         return None
@@ -98,7 +98,7 @@ def delayed_tft_or_mirror(opp_hist, self_hist, opp_bot):
 delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) + cooperate_bot
 
 def lookahead_or_tft(opp_hist, self_hist, opp_bot):
-    c_response, d_response = dilemma.simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
+    c_response, d_response = simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
     if d_response$[1]:
         return defect()
     elif c_response$[1]:
@@ -108,15 +108,15 @@ def lookahead_or_tft(opp_hist, self_hist, opp_bot):
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate_or_tft(opp_hist, self_hist, opp_bot):
-    c_simulation, d_simulation = dilemma.winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
+    c_simulation, d_simulation = winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
     c_scores = c_simulation$[3]
     d_scores = d_simulation$[3]
-    return dilemma.decide(c_scores, d_scores)
+    return decide(c_scores, d_scores)
 simulate_or_tft_bot = pd_bot(simulate_or_tft) + tft_or_mirror_bot
 
 def simulate_or_mirror(opp_hist, self_hist, opp_bot):
-    c_simulation, d_simulation = dilemma.winnings(mirror_or_tft_bot, self_hist, opp_bot, opp_hist)
+    c_simulation, d_simulation = winnings(mirror_or_tft_bot, self_hist, opp_bot, opp_hist)
     c_scores = c_simulation$[3]
     d_scores = d_simulation$[3]
-    return dilemma.decide(c_scores, d_scores)
+    return decide(c_scores, d_scores)
 simulate_or_mirror_bot = pd_bot(simulate_or_mirror) + mirror_or_tft_bot
