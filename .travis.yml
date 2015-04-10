@@ -6,7 +6,8 @@ python:
   - "3.3"
   - "3.4"
 
-install: true
+install:
+  - pip install coconut
 
 script:
   - coconut prisoner
