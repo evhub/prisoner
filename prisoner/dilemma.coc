@@ -16,8 +16,7 @@ class pd_bot(object):
     default = False
 
     def __init__(self, *funcs):
-        self.funcs = tuple(funcs)
-        self.default = default
+        self.funcs = funcs |> tuple
 
     def copy(self):
         out = pd_bot(*self.funcs)
