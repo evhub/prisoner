@@ -26,6 +26,7 @@ class pd_bot(object):
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
             self.funcs += other.funcs
+            return self
         else:
             raise TypeError("pd_bot objects can only be added to other pd_bot objects")
 
