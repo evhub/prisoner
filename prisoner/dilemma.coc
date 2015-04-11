@@ -168,13 +168,14 @@ def score_repr(scores):
     out.append("}")
     return "\n".join(out)
 
-def main(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
-    if debug > 0:
-        count = 0
+def main(participants, limit=None, time=1, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+    count = 0
     for scores in tournament(participants, time, rounds, payoffs, debug-1):
+        count += 1
         if debug > 0:
-            count += 1
             print("\n\nROUND "+str(count)+" RESULTS:\n"+score_repr(scores))
+        if count >= limit:
+            break
     return scores.keys() |> list
 
 # BOT UTILITIES:
