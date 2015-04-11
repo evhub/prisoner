@@ -96,7 +96,7 @@ def game(a, b, a_hist=None, b_hist=None, time=None, debug=0):
         a_hist.append(a_c)
         b_hist.append(b_c)
         if debug > 0:
-            print("    "+str(a_c)+" "*a_c+str(b_c))
+            print("    "+str(a_c)+" "*(a_c+1)+str(b_c))
         yield a_c, b_c
 
 def score_move(a_c, b_c, payoffs=default_payoffs):
@@ -168,7 +168,7 @@ def score_repr(scores):
     out.append("}")
     return "\n".join(out)
 
-def main(participants, limit=None, time=1, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+def winners(participants, time=None, limit=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     count = 0
     for scores in tournament(participants, time, rounds, payoffs, debug-1):
         count += 1

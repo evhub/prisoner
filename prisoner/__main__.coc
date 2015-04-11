@@ -55,4 +55,4 @@ all_bots.update(slow_bots)
 # MAIN:
 
 if __name__ == "__main__":
-    dilemma.main(all_bots, 1, debug=4)
+    print("\n\n\nWINNERS: "+str(dilemma.winners(all_bots, 1, debug=3)))
