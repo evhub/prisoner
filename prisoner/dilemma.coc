@@ -42,11 +42,11 @@ class pd_bot(object):
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
         for func in self.funcs:
             if time is None:
-                result = func(list(self_hist), list(opp_hist), opp_bot) |> bool
+                result = func(list(self_hist), list(opp_hist), opp_bot)
             else:
-                result = time_limit(bool$(func$(list(self_hist), list(opp_hist), opp_bot)), None, time)
+                result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot), None, time)
             if result is not None:
-                return result
+                return result |> bool
         return self.default
 
 # GAME UTILITIES:
