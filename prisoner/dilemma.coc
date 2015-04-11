@@ -2,6 +2,7 @@
 
 import itertools
 import signal
+import random
 
 # DEFAULTS:
 
@@ -115,7 +116,9 @@ def score_game(moveiter, payoffs=default_payoffs):
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs):
     return game(a, b, a_hist, b_hist, time) |> score_game$(payoffs=payoffs)
 
-def round_robin(rounds, participants, time=None, payoffs=default_payoffs):
+around(n) = int(random.gauss(n, n/10))
+
+def round_robin(participants, time=None, rounds=around(100), payoffs=default_payoffs):
     if rounds > 0:
         scores = {}
         for participant in participants:
@@ -131,9 +134,11 @@ def round_robin(rounds, participants, time=None, payoffs=default_payoffs):
 def score_sort(scores):
     return scores.items() |> sorted$(key=itemgetter(1))
 
-def tournament(rounds, participants, time=None, payoffs=default_payoffs):
+def tournament(participants, time=None, rounds=around(100), payoffs=default_payoffs):
     while len(participants) > 1:
-        scores = round_robin(rounds, participants, time=time, payoffs=payoffs)
+        if not isinstance(rounds, int):
+            rounds = rounds()
+        scores = round_robin(participants, time, rounds, payoffs)
         yield scores
         participants = participants.copy()
         lowest = None

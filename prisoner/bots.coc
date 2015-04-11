@@ -1,7 +1,6 @@
 # IMPORTS:
 
-from .dilemma import pd_bot, simulate, winnings, decide
-import random
+from .dilemma import random, pd_bot, simulate, winnings, decide
 
 # BOTS:
 
