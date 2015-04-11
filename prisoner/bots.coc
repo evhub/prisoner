@@ -66,7 +66,7 @@ exploit_or_nice_tft_bot = pd_bot(exploiter) + nice_tft_bot
 exploit_or_delayed_tft_bot = pd_bot(exploiter) + delayed_tft_bot
 
 def mirror(self_bot, self_hist, opp_hist, opp_bot):
-    return opp_bot(self_hist, opp_hist, self_bot)
+    return opp_bot(opp_hist, self_hist, self_bot)
 
 justice_mirror = mirror$(cooperate_bot)
 justice_mirror_bot = pd_bot(justice_mirror)
