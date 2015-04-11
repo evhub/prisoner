@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Compiled with Coconut version 0.2.1-dev [Eocene]
+
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
