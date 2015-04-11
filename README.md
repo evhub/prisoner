@@ -3,6 +3,19 @@ Prisoner
 
 A Python prisoner's dilemma competition adjudicator, written in [Coconut](https://github.com/evhub/coconut).
 
+## Goal
+
+The goal of the competition is to write a Prisoner's Dilemma bot that survives into the final round. Each round, every bot is pitted against every other bot for approximately (but not usually exactly) 100 rounds, and the bot or bots with the lowest total score among all the games they played that round are eliminated. The game continues until all the bots left are tied.
+
+Score is determined as follows:
+- Both cooperate:
+ * +2 score for both
+- Both defect:
+ * +1 score for both
+- One cooperates, one defects:
+ * Cooperator: +0 score
+ * Defector: +3 score
+
 ## Instructions
 
 First, create a Python (`.py`) file containing this code:
