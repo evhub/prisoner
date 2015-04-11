@@ -128,7 +128,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
             scores[participant] = 0
         for a,b in itertools.permutations(participants.keys(), 2):
             if debug > 0:
-                print("\n\n----- "+a+" vs. "+b+" -----")
+                print("\n\n-- "+a+" vs. "+b+" --")
             a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug-1)$[rounds-1]
             scores[a] += a_score
             scores[b] += b_score
@@ -150,7 +150,7 @@ def tournament(participants, time=None, rounds=default_rounds, payoffs=default_p
             rounds = rounds()
         if debug > 0:
             count += 1
-            print("\n\n\n===== ROUND "+str(count)+" =====")
+            print("\n\n\n==== ROUND "+str(count)+" ====")
         scores = round_robin(participants, time, rounds, payoffs, debug-1)
         yield scores
         participants = participants.copy()
