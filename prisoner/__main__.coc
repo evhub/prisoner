@@ -55,5 +55,4 @@ all_bots.update(slow_bots)
 # MAIN:
 
 if __name__ == "__main__":
-    for scores in dilemma.tournament(all_bots, 1):
-        scores |> dilemma.score_repr |> print
+    dilemma.main(all_bots, 1, debug=4)

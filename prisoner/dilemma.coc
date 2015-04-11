@@ -11,6 +11,9 @@ default_payoffs = (
                   (3,0), (1,1)
                   )
 
+around(n) = int(random.gauss(n, n/10))
+default_rounds = around(100)
+
 # BOT CONSTRUCTOR:
 
 class pd_bot(object):
@@ -29,7 +32,7 @@ class pd_bot(object):
             self.funcs += other.funcs
             return self
         else:
-            raise TypeError("pd_bot objects can only be added to other pd_bot objects")
+            raise TypeError("pd_bot objects can only be added to other pd_bot objects, not "+repr(other))
 
     def __add__(self, other):
         out = self.copy()
@@ -39,9 +42,9 @@ class pd_bot(object):
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
         for func in self.funcs:
             if time is None:
-                result = func(list(self_hist), list(opp_hist), opp_bot)
+                result = func(list(self_hist), list(opp_hist), opp_bot) |> bool
             else:
-                result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot), None, time)
+                result = time_limit(bool$(func$(list(self_hist), list(opp_hist), opp_bot)), None, time)
             if result is not None:
                 return result
         return self.default
@@ -71,15 +74,15 @@ def time_limit(func, default, time):
 
 def bot_call(a, a_hist, b, b_hist, time=None):
     if isinstance(a, pd_bot) and isinstance(b, pd_bot):
-        return a(list(a_hist), list(b_hist), b, time)
+        return a(list(a_hist), list(b_hist), b, time) |> bool
     else:
-        raise TypeError("bots must be pd_bot objects")
+        raise TypeError("bots must be pd_bot objects, not "+repr(a)+" and "+repr(b))
 
 def moves(a, b, a_hist, b_hist, time=None):
     return (bot_call(a, a_hist, b, b_hist, time),
             bot_call(b, b_hist, a, a_hist, time))
 
-def game(a, b, a_hist=None, b_hist=None, time=None):
+def game(a, b, a_hist=None, b_hist=None, time=None, debug=0):
     if a_hist is None:
         a_hist = []
     else:
@@ -92,6 +95,8 @@ def game(a, b, a_hist=None, b_hist=None, time=None):
         a_c, b_c = moves(a, b, a_hist, b_hist, time)
         a_hist.append(a_c)
         b_hist.append(b_c)
+        if debug > 0:
+            print("    "+str(a_c)+" "*a_c+str(b_c))
         yield a_c, b_c
 
 def score_move(a_c, b_c, payoffs=default_payoffs):
@@ -113,20 +118,23 @@ def score_game(moveiter, payoffs=default_payoffs):
         b_score += b_change
         yield (a_score, b_score)
 
-def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs):
-    return game(a, b, a_hist, b_hist, time) |> score_game$(payoffs=payoffs)
+def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
+    return game(a, b, a_hist, b_hist, time, debug) |> score_game$(payoffs=payoffs)
 
-around(n) = int(random.gauss(n, n/10))
-
-def round_robin(participants, time=None, rounds=around(100), payoffs=default_payoffs):
+def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if rounds > 0:
         scores = {}
         for participant in participants:
             scores[participant] = 0
         for a,b in itertools.permutations(participants.keys(), 2):
-            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs)$[rounds-1]
+            if debug > 0:
+                print("\n\n----- "+a+" vs. "+b+" -----")
+            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug-1)$[rounds-1]
             scores[a] += a_score
             scores[b] += b_score
+            if debug > 0:
+                print("    "+a+": "+str(a_score))
+                print("    "+b+": "+str(b_score))
         return scores
     else:
         raise ValueError("rounds must be > 0")
@@ -134,11 +142,16 @@ def round_robin(participants, time=None, rounds=around(100), payoffs=default_pay
 def score_sort(scores):
     return scores.items() |> sorted$(key=itemgetter(1))
 
-def tournament(participants, time=None, rounds=around(100), payoffs=default_payoffs):
+def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+    if debug > 0:
+        count = 0
     while len(participants) > 1:
         if not isinstance(rounds, int):
             rounds = rounds()
-        scores = round_robin(participants, time, rounds, payoffs)
+        if debug > 0:
+            count += 1
+            print("\n\n\n===== ROUND "+str(count)+" =====")
+        scores = round_robin(participants, time, rounds, payoffs, debug-1)
         yield scores
         participants = participants.copy()
         lowest = None
@@ -154,6 +167,15 @@ def score_repr(scores):
         out.append("    "+name+": "+str(score))
     out.append("}")
     return "\n".join(out)
+
+def main(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+    if debug > 0:
+        count = 0
+    for scores in dilemma.tournament(participants, time, rounds, payoffs, debug-1):
+        if debug > 0:
+            count += 1
+            print("\n\nROUND "+str(count)+" RESULTS:\n"+score_repr(scores))
+    return scores.keys() |> list
 
 # BOT UTILITIES:
 
