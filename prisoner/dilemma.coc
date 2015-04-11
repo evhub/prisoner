@@ -168,7 +168,7 @@ def score_repr(scores):
     out.append("}")
     return "\n".join(out)
 
-def winners(participants, time=None, limit=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     count = 0
     for scores in tournament(participants, time, rounds, payoffs, debug-1):
         count += 1
