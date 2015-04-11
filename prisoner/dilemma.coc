@@ -174,7 +174,7 @@ def winners(participants, time=None, limit=None, rounds=default_rounds, payoffs=
         count += 1
         if debug > 0:
             print("\n\nROUND "+str(count)+" RESULTS:\n"+score_repr(scores))
-        if count >= limit:
+        if limit is not None and count >= limit:
             break
     return scores.keys() |> list
 
