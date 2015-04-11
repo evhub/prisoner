@@ -3,11 +3,9 @@ language: python
 python:
   - "3.4"
 
-install:
-  - pip install coconut
+install: true
 
 script:
-  - coconut prisoner
   - python prisoner
 
 notifications:
