@@ -62,7 +62,7 @@ all_bots.update(extra_bots)
 def main(bots):
     results = dilemma.winners(bots, time=1, debug=2)
     print("\n\n==== WINNERS ====\n")
-    for winner in results:
+    for winner in __coconut__.pipe(results, reversed):
         print("    " + winner)
 
 if __name__ == "__main__":
