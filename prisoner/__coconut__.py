@@ -1,67 +1,63 @@
-#!/usr/bin/env python
-
-# Compiled with Coconut version 0.2.1-dev [Eocene]
 
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
-try:
-    from future_builtins import *
-except ImportError:
-    pass
+try: from future_builtins import *
+except ImportError: pass
+try: xrange
+except NameError: pass
+else:
+    range = xrange
+try: ascii
+except NameError: ascii = repr
+try: unichr
+except NameError: pass
+else:
+    py2_chr = chr
+    chr = unichr
+_coconut_encoding = "UTF-8"
+try: unicode
+except NameError: pass
+else:
+    bytes, str = str, unicode
+    py2_print = print
+    def print(*args, **kwargs):
+        """Wraps py2_print."""
+        return py2_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
+try: raw_input
+except NameError: pass
+else:
+    py2_input = raw_input
+    def input(*args, **kwargs):
+        """Wraps py2_input."""
+        return py2_input(*args, **kwargs).decode(_coconut_encoding)
 
-"""Built-In Coconut Functions."""
+"""Built-in Coconut Functions."""
 
 import functools
-partial = functools.partial
-reduce = functools.reduce
-
 import operator
-itemgetter = operator.itemgetter
-attrgetter = operator.attrgetter
-methodcaller = operator.methodcaller
-
 import itertools
-chain = itertools.chain
-islice = itertools.islice
-takewhile = itertools.takewhile
-dropwhile = itertools.dropwhile
-tee = itertools.tee
-
 import collections
-data = collections.namedtuple
 
-def iterable(obj):
-    """Determines Whether An Object Is Iterable."""
-    try:
-        iter(obj)
-    except TypeError:
-        return False
-    else:
-        return True
+try:
+    import collections.abc as abc
+except ImportError:
+    abc = collections
 
-def bool_and(a, b):
-    """Boolean And Operator Function."""
-    return a and b
-
-def bool_or(a, b):
-    """Boolean Or Operator Function."""
-    return a or b
-
-def compose(f, g):
-    """Composing (f..g)."""
-    return lambda *args, **kwargs: f(g(*args, **kwargs))
-
-def pipe(*args):
-    """Pipelining (x |> func)."""
-    out = args[0]
-    for func in args[1:]:
-        out = func(out)
-    return out
+object = object
+int = int
+set = set
+frozenset = frozenset
+tuple = tuple
+list = list
+len = len
+isinstance = isinstance
+getattr = getattr
+slice = slice
 
 def recursive(func):
     """Tail Call Optimizer."""
-    state = [True, None]
+    state = [True, None] # toplevel, (args, kwargs)
     recurse = object()
     @functools.wraps(func)
     def tailed_func(*args, **kwargs):
@@ -82,3 +78,6 @@ def recursive(func):
             state[1] = args, kwargs
             return recurse
     return tailed_func
+
+class MatchError(Exception):
+    pass

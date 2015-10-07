@@ -11,7 +11,7 @@ default_payoffs = (
                   (3,0), (1,1)
                   )
 
-around(n) = int(random.gauss(n, n/10))
+def around(n) = int(random.gauss(n, n/10))
 default_rounds = around(100)
 
 # BOT CONSTRUCTOR:
@@ -65,7 +65,7 @@ def time_limit(func, default, time):
     signal.alarm(time)
     try:
         result = func()
-    except (TimeOut, RuntimeError):
+    except TimeOut, RuntimeError:
         return default
     else:
         return result

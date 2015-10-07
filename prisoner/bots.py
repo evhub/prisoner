@@ -1,28 +1,55 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
-# Compiled with Coconut version 0.2.1-dev [Eocene]
+# Compiled with Coconut version 0.3.1-dev [Ilocos]
 
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
-try:
-    from future_builtins import *
-except ImportError:
-    pass
+try: from future_builtins import *
+except ImportError: pass
+try: xrange
+except NameError: pass
+else:
+    range = xrange
+try: ascii
+except NameError: ascii = repr
+try: unichr
+except NameError: pass
+else:
+    py2_chr = chr
+    chr = unichr
+_coconut_encoding = "UTF-8"
+try: unicode
+except NameError: pass
+else:
+    bytes, str = str, unicode
+    py2_print = print
+    def print(*args, **kwargs):
+        """Wraps py2_print."""
+        return py2_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
+try: raw_input
+except NameError: pass
+else:
+    py2_input = raw_input
+    def input(*args, **kwargs):
+        """Wraps py2_input."""
+        return py2_input(*args, **kwargs).decode(_coconut_encoding)
 
 import sys as _coconut_sys
 import os.path as _coconut_os_path
 _coconut_sys.path.append(_coconut_os_path.dirname(_coconut_os_path.abspath(__file__)))
 import __coconut__
 
-reduce = __coconut__.reduce
-itemgetter = __coconut__.itemgetter
-attrgetter = __coconut__.attrgetter
-methodcaller = __coconut__.methodcaller
-takewhile = __coconut__.takewhile
-dropwhile = __coconut__.dropwhile
-tee = __coconut__.tee
+reduce = __coconut__.functools.reduce
+itemgetter = __coconut__.operator.itemgetter
+attrgetter = __coconut__.operator.attrgetter
+methodcaller = __coconut__.operator.methodcaller
+takewhile = __coconut__.itertools.takewhile
+dropwhile = __coconut__.itertools.dropwhile
+tee = __coconut__.itertools.tee
 recursive = __coconut__.recursive
+MatchError = __coconut__.MatchError
 
 # Compiled Coconut: ------------------------------------------------------------
 
@@ -39,7 +66,7 @@ def defect(self_hist=None, opp_hist=None, opp_bot=None): return False
 defect_bot = pd_bot(defect)
 
 def coin_flip(self_hist=None, opp_hist=None, opp_bot=None):
-    return __coconut__.pipe(random.getrandbits(1), bool)
+    return (bool)(random.getrandbits(1))
 coin_flip_bot = pd_bot(coin_flip)
 
 def tit_for_tat(self_hist, opp_hist, opp_bot=None):
@@ -81,9 +108,9 @@ mean_switcher_bot = pd_bot(switcher)
 nice_switcher_bot = mean_switcher_bot + cooperate_bot
 
 def exploiter(self_hist, opp_hist, opp_bot):
-    if next(__coconut__.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), 1, (1) + 1))[1]:
+    if next(__coconut__.itertools.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), 1, (1) + 1))[1]:
         return defect()
-    elif not next(__coconut__.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), 1, (1) + 1))[1]:
+    elif not next(__coconut__.itertools.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), 1, (1) + 1))[1]:
         return defect()
     else:
         return None
@@ -100,7 +127,7 @@ def mirror_or_cooperate(self_hist, opp_hist, opp_bot):
     return mirror(mirror_bot, self_hist, opp_hist, opp_bot)
 mirror_bot = pd_bot(mirror_or_cooperate) + cooperate_bot
 
-justice_mirror = __coconut__.partial(mirror, cooperate_bot)
+justice_mirror = __coconut__.functools.partial(mirror, cooperate_bot)
 justice_mirror_bot = pd_bot(justice_mirror)
 
 def mirror_or_tft(self_hist, opp_hist, opp_bot):
@@ -130,9 +157,9 @@ delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) 
 
 def lookahead_or_tft(self_hist, opp_hist, opp_bot):
     c_response, d_response = simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
-    if next(__coconut__.islice(d_response, 1, (1) + 1)):
+    if next(__coconut__.itertools.islice(d_response, 1, (1) + 1)):
         return defect()
-    elif next(__coconut__.islice(c_response, 1, (1) + 1)):
+    elif next(__coconut__.itertools.islice(c_response, 1, (1) + 1)):
         return cooperate()
     else:
         return defect()
@@ -140,14 +167,14 @@ lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
-    c_scores = next(__coconut__.islice(c_simulation, 3, (3) + 1))
-    d_scores = next(__coconut__.islice(d_simulation, 3, (3) + 1))
+    c_scores = next(__coconut__.itertools.islice(c_simulation, 3, (3) + 1))
+    d_scores = next(__coconut__.itertools.islice(d_simulation, 3, (3) + 1))
     return decide(c_scores, d_scores)
 simulate_or_tft_bot = pd_bot(simulate_or_tft) + tft_or_mirror_bot
 
 def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(mirror_or_tft_bot, self_hist, opp_bot, opp_hist)
-    c_scores = next(__coconut__.islice(c_simulation, 3, (3) + 1))
-    d_scores = next(__coconut__.islice(d_simulation, 3, (3) + 1))
+    c_scores = next(__coconut__.itertools.islice(c_simulation, 3, (3) + 1))
+    d_scores = next(__coconut__.itertools.islice(d_simulation, 3, (3) + 1))
     return decide(c_scores, d_scores)
 simulate_or_mirror_bot = pd_bot(simulate_or_mirror) + mirror_or_tft_bot

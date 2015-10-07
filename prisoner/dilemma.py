@@ -1,28 +1,55 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
-# Compiled with Coconut version 0.2.1-dev [Eocene]
+# Compiled with Coconut version 0.3.1-dev [Ilocos]
 
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
-try:
-    from future_builtins import *
-except ImportError:
-    pass
+try: from future_builtins import *
+except ImportError: pass
+try: xrange
+except NameError: pass
+else:
+    range = xrange
+try: ascii
+except NameError: ascii = repr
+try: unichr
+except NameError: pass
+else:
+    py2_chr = chr
+    chr = unichr
+_coconut_encoding = "UTF-8"
+try: unicode
+except NameError: pass
+else:
+    bytes, str = str, unicode
+    py2_print = print
+    def print(*args, **kwargs):
+        """Wraps py2_print."""
+        return py2_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
+try: raw_input
+except NameError: pass
+else:
+    py2_input = raw_input
+    def input(*args, **kwargs):
+        """Wraps py2_input."""
+        return py2_input(*args, **kwargs).decode(_coconut_encoding)
 
 import sys as _coconut_sys
 import os.path as _coconut_os_path
 _coconut_sys.path.append(_coconut_os_path.dirname(_coconut_os_path.abspath(__file__)))
 import __coconut__
 
-reduce = __coconut__.reduce
-itemgetter = __coconut__.itemgetter
-attrgetter = __coconut__.attrgetter
-methodcaller = __coconut__.methodcaller
-takewhile = __coconut__.takewhile
-dropwhile = __coconut__.dropwhile
-tee = __coconut__.tee
+reduce = __coconut__.functools.reduce
+itemgetter = __coconut__.operator.itemgetter
+attrgetter = __coconut__.operator.attrgetter
+methodcaller = __coconut__.operator.methodcaller
+takewhile = __coconut__.itertools.takewhile
+dropwhile = __coconut__.itertools.dropwhile
+tee = __coconut__.itertools.tee
 recursive = __coconut__.recursive
+MatchError = __coconut__.MatchError
 
 # Compiled Coconut: ------------------------------------------------------------
 
@@ -45,7 +72,7 @@ class pd_bot(object):
     default = False
 
     def __init__(self, *funcs):
-        self.funcs = __coconut__.pipe(funcs, tuple)
+        self.funcs = (tuple)(funcs)
 
     def copy(self):
         out = pd_bot(*self.funcs)
@@ -69,9 +96,9 @@ class pd_bot(object):
             if time is None:
                 result = func(list(self_hist), list(opp_hist), opp_bot)
             else:
-                result = time_limit(__coconut__.partial(func, list(self_hist), list(opp_hist), opp_bot), None, time)
+                result = time_limit(__coconut__.functools.partial(func, list(self_hist), list(opp_hist), opp_bot), None, time)
             if result is not None:
-                return __coconut__.pipe(result, bool)
+                return (bool)(result)
         return self.default
 
 # GAME UTILITIES:
@@ -83,7 +110,7 @@ def time_limit(func, default, time):
         raise TimeOut()
     try:
         signal.SIGALRM
-    except AttributeError:
+    except (AttributeError):
         raise OSError("system does not support signal.SIGALRM")
     else:
         signal.signal(signal.SIGALRM, timeout)
@@ -99,7 +126,7 @@ def time_limit(func, default, time):
 
 def bot_call(a, a_hist, b, b_hist, time=None):
     if isinstance(a, pd_bot) and isinstance(b, pd_bot):
-        return __coconut__.pipe(a(list(a_hist), list(b_hist), b, time), bool)
+        return (bool)(a(list(a_hist), list(b_hist), b, time))
     else:
         raise TypeError("bots must be pd_bot objects, not " + repr(a) + " and " + repr(b))
 
@@ -143,7 +170,7 @@ def score_game(moveiter, payoffs=default_payoffs):
         yield (a_score, b_score)
 
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
-    return __coconut__.pipe(game(a, b, a_hist, b_hist, time, debug), __coconut__.partial(score_game, payoffs=payoffs))
+    return (__coconut__.functools.partial(score_game, payoffs=payoffs))(game(a, b, a_hist, b_hist, time, debug))
 
 def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if rounds > 0:
@@ -153,7 +180,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         for a, b in itertools.permutations(participants.keys(), 2):
             if debug > 0:
                 print("\n-- " + a + " vs. " + b + " --")
-            a_score, b_score = next(__coconut__.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), rounds - 1, (rounds - 1) + 1))
+            a_score, b_score = next(__coconut__.itertools.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), rounds - 1, (rounds - 1) + 1))
             scores[a] += a_score
             scores[b] += b_score
             if debug > 0:
@@ -164,7 +191,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         raise ValueError("rounds must be > 0")
 
 def score_sort(scores):
-    return __coconut__.pipe(scores.items(), __coconut__.partial(sorted, key=itemgetter(1)))
+    return (__coconut__.functools.partial(sorted, key=itemgetter(1)))(scores.items())
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if debug > 0:
@@ -179,7 +206,7 @@ def tournament(participants, time=None, rounds=default_rounds, payoffs=default_p
         yield scores
         participants = participants.copy()
         lowest = None
-        for name, score in __coconut__.pipe(scores, score_sort):
+        for name, score in (score_sort)(scores):
             if lowest is None:
                 lowest = score
             if score == lowest:
@@ -187,7 +214,7 @@ def tournament(participants, time=None, rounds=default_rounds, payoffs=default_p
 
 def score_repr(scores):
     out = ["{"]
-    for name, score in __coconut__.pipe(scores, score_sort, reversed):
+    for name, score in (reversed)((score_sort)(scores)):
         out.append("    " + name + ": " + str(score))
     out.append("}")
     return "\n".join(out)
@@ -200,7 +227,7 @@ def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=
             print("\nROUND " + str(count) + " RESULTS:\n" + score_repr(scores))
         if limit is not None and count >= limit:
             break
-    return __coconut__.pipe(scores.keys(), list)
+    return (list)(scores.keys())
 
 # BOT UTILITIES:
 
@@ -210,7 +237,7 @@ def simulate(self_bot, self_hist, opp_bot, opp_hist, self_move=None, opp_move=No
     if self_move is None:
         return (simulate(self_bot, self_hist, opp_bot, opp_hist, True, opp_move), simulate(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
     else:
-        return __coconut__.chain(((self_move, opp_move,),), game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))
+        return __coconut__.itertools.chain(((self_move, opp_move,),), game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, self_move=None, payoffs=default_payoffs):
     simulation = simulate(self_bot, self_hist, opp_bot, opp_hist, self_move)

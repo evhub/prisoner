@@ -4,10 +4,10 @@ from .dilemma import random, pd_bot, simulate, winnings, decide
 
 # BOTS:
 
-cooperate(self_hist=None, opp_hist=None, opp_bot=None) = True
+def cooperate(self_hist=None, opp_hist=None, opp_bot=None) = True
 cooperate_bot = pd_bot(cooperate)
 
-defect(self_hist=None, opp_hist=None, opp_bot=None) = False
+def defect(self_hist=None, opp_hist=None, opp_bot=None) = False
 defect_bot = pd_bot(defect)
 
 def coin_flip(self_hist=None, opp_hist=None, opp_bot=None):
