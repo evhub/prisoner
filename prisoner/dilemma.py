@@ -1,46 +1,43 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Compiled with Coconut version 0.3.1-dev [Ilocos]
+# Compiled with Coconut version 0.3.3-dev [Lauric]
 
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
-try: from future_builtins import *
-except ImportError: pass
-try: xrange
-except NameError: pass
-else:
-    range = xrange
-try: ascii
-except NameError: ascii = repr
-try: unichr
-except NameError: pass
-else:
-    py2_chr = chr
-    chr = unichr
-_coconut_encoding = "UTF-8"
-try: unicode
-except NameError: pass
-else:
-    bytes, str = str, unicode
-    py2_print = print
-    def print(*args, **kwargs):
-        """Wraps py2_print."""
-        return py2_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
-try: raw_input
-except NameError: pass
-else:
-    py2_input = raw_input
-    def input(*args, **kwargs):
-        """Wraps py2_input."""
-        return py2_input(*args, **kwargs).decode(_coconut_encoding)
-
 import sys as _coconut_sys
+if _coconut_sys.version_info < (3,):
+    py2_filter, py2_hex, py2_map, py2_oct, py2_zip = filter, hex, map, oct, zip
+    from future_builtins import *
+    py2_range, range = range, xrange
+    py2_int = int
+    _coconut_int, _coconut_long = int, long
+    class _coconut_metaint(type):
+        def __instancecheck__(cls, inst):
+            return isinstance(inst, (_coconut_int, _coconut_long))
+    class int(_coconut_int):
+        """Python 3 int."""
+        __metaclass__ = _coconut_metaint
+    py2_chr, chr = chr, unichr
+    bytes, str = str, unicode
+    _coconut_encoding = "UTF-8"
+    py2_print = print
+    _coconut_print = print
+    def print(*args, **kwargs):
+        """Python 3 print."""
+        return _coconut_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
+    py2_input = raw_input
+    _coconut_input = raw_input
+    def input(*args, **kwargs):
+        """Python 3 input."""
+        return _coconut_input(*args, **kwargs).decode(_coconut_encoding)
+
 import os.path as _coconut_os_path
 _coconut_sys.path.append(_coconut_os_path.dirname(_coconut_os_path.abspath(__file__)))
 import __coconut__
 
+__coconut_version__ = __coconut__.version
 reduce = __coconut__.functools.reduce
 itemgetter = __coconut__.operator.itemgetter
 attrgetter = __coconut__.operator.attrgetter
@@ -81,14 +78,14 @@ class pd_bot(object):
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
-            self.funcs += other.funcs
+            self.funcs += (other.funcs)
             return self
         else:
             raise TypeError("pd_bot objects can only be added to other pd_bot objects, not " + repr(other))
 
     def __add__(self, other):
         out = self.copy()
-        out += other
+        out += (other)
         return out
 
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
@@ -165,8 +162,8 @@ def score_game(moveiter, payoffs=default_payoffs):
     b_score = 0
     for a_c, b_c in moveiter:
         a_change, b_change = score_move(a_c, b_c, payoffs)
-        a_score += a_change
-        b_score += b_change
+        a_score += (a_change)
+        b_score += (b_change)
         yield (a_score, b_score)
 
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
@@ -181,8 +178,8 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
             if debug > 0:
                 print("\n-- " + a + " vs. " + b + " --")
             a_score, b_score = next(__coconut__.itertools.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), rounds - 1, (rounds - 1) + 1))
-            scores[a] += a_score
-            scores[b] += b_score
+            scores[a] += (a_score)
+            scores[b] += (b_score)
             if debug > 0:
                 print("    " + a + ": " + str(a_score))
                 print("    " + b + ": " + str(b_score))
@@ -200,7 +197,7 @@ def tournament(participants, time=None, rounds=default_rounds, payoffs=default_p
         if not isinstance(rounds, int):
             rounds = rounds()
         if debug > 0:
-            count += 1
+            count += (1)
             print("\n\n==== ROUND " + str(count) + " ====")
         scores = round_robin(participants, time, rounds, payoffs, debug - 1)
         yield scores
@@ -222,7 +219,7 @@ def score_repr(scores):
 def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     count = 0
     for scores in tournament(participants, time, rounds, payoffs, debug - 1):
-        count += 1
+        count += (1)
         if debug > 0:
             print("\nROUND " + str(count) + " RESULTS:\n" + score_repr(scores))
         if limit is not None and count >= limit:
@@ -237,7 +234,7 @@ def simulate(self_bot, self_hist, opp_bot, opp_hist, self_move=None, opp_move=No
     if self_move is None:
         return (simulate(self_bot, self_hist, opp_bot, opp_hist, True, opp_move), simulate(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
     else:
-        return __coconut__.itertools.chain(((self_move, opp_move,),), game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))
+        return __coconut__.itertools.chain.from_iterable((_coconut_lazy_item() for _coconut_lazy_item in (lambda: ((self_move, opp_move,),), lambda: game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))))
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, self_move=None, payoffs=default_payoffs):
     simulation = simulate(self_bot, self_hist, opp_bot, opp_hist, self_move)

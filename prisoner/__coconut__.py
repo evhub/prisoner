@@ -1,44 +1,39 @@
-
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
-try: from future_builtins import *
-except ImportError: pass
-try: xrange
-except NameError: pass
-else:
-    range = xrange
-try: ascii
-except NameError: ascii = repr
-try: unichr
-except NameError: pass
-else:
-    py2_chr = chr
-    chr = unichr
-_coconut_encoding = "UTF-8"
-try: unicode
-except NameError: pass
-else:
+import sys as _coconut_sys
+if _coconut_sys.version_info < (3,):
+    py2_filter, py2_hex, py2_map, py2_oct, py2_zip = filter, hex, map, oct, zip
+    from future_builtins import *
+    py2_range, range = range, xrange
+    py2_int = int
+    _coconut_int, _coconut_long = int, long
+    class _coconut_metaint(type):
+        def __instancecheck__(cls, inst):
+            return isinstance(inst, (_coconut_int, _coconut_long))
+    class int(_coconut_int):
+        """Python 3 int."""
+        __metaclass__ = _coconut_metaint
+    py2_chr, chr = chr, unichr
     bytes, str = str, unicode
+    _coconut_encoding = "UTF-8"
     py2_print = print
+    _coconut_print = print
     def print(*args, **kwargs):
-        """Wraps py2_print."""
-        return py2_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
-try: raw_input
-except NameError: pass
-else:
+        """Python 3 print."""
+        return _coconut_print(*(str(x).encode(_coconut_encoding) for x in args), **kwargs)
     py2_input = raw_input
+    _coconut_input = raw_input
     def input(*args, **kwargs):
-        """Wraps py2_input."""
-        return py2_input(*args, **kwargs).decode(_coconut_encoding)
+        """Python 3 input."""
+        return _coconut_input(*args, **kwargs).decode(_coconut_encoding)
 
-"""Built-in Coconut Functions."""
+version = "0.3.3-dev"
 
 import functools
 import operator
 import itertools
 import collections
-
 try:
     import collections.abc as abc
 except ImportError:
@@ -56,7 +51,7 @@ getattr = getattr
 slice = slice
 
 def recursive(func):
-    """Tail Call Optimizer."""
+    """Tail recursion optimizer."""
     state = [True, None] # toplevel, (args, kwargs)
     recurse = object()
     @functools.wraps(func)
@@ -80,4 +75,4 @@ def recursive(func):
     return tailed_func
 
 class MatchError(Exception):
-    pass
+    """Pattern-matching error."""
