@@ -53,8 +53,8 @@ MatchError = __coconut__.MatchError
 # IMPORTS:
 
 import itertools
-import signal
 import random
+import threading
 
 # DEFAULTS:
 
@@ -101,25 +101,20 @@ class pd_bot(object):
 # GAME UTILITIES:
 
 def time_limit(func, default, time):
-    class TimeOut(Exception):
-        pass
-    def timeout(*args, **kwargs):
-        raise TimeOut()
-    try:
-        signal.SIGALRM
-    except (AttributeError):
-        raise OSError("system does not support signal.SIGALRM")
-    else:
-        signal.signal(signal.SIGALRM, timeout)
-    signal.alarm(time)
-    try:
-        result = func()
-    except (TimeOut, RuntimeError):
-        return default
-    else:
-        return result
-    finally:
-        signal.alarm(0)
+    class storage(__coconut__.object):
+        result = default
+        def run(self):
+            try:
+                self.result = func()
+            except (RuntimeError):
+                pass
+    store = storage()
+    runner = threading.Thread(target=store.run)
+    runner.start()
+    runner.join(time)
+    if runner.isAlive():
+        runner.terminate()
+    return store.result
 
 def bot_call(a, a_hist, b, b_hist, time=None):
     if isinstance(a, pd_bot) and isinstance(b, pd_bot):
@@ -234,7 +229,7 @@ def simulate(self_bot, self_hist, opp_bot, opp_hist, self_move=None, opp_move=No
     if self_move is None:
         return (simulate(self_bot, self_hist, opp_bot, opp_hist, True, opp_move), simulate(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
     else:
-        return __coconut__.itertools.chain.from_iterable((_coconut_lazy_item() for _coconut_lazy_item in (lambda: ((self_move, opp_move,),), lambda: game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))))
+        return __coconut__.itertools.chain.from_iterable((_coconut_lazy_item() for _coconut_lazy_item in (lambda: (_coconut_lazy_item() for _coconut_lazy_item in (lambda: (self_move, opp_move),)), lambda: game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move], None))))
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, self_move=None, payoffs=default_payoffs):
     simulation = simulate(self_bot, self_hist, opp_bot, opp_hist, self_move)
