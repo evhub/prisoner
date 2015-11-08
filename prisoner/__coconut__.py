@@ -28,7 +28,7 @@ if _coconut_sys.version_info < (3,):
         """Python 3 input."""
         return _coconut_input(*args, **kwargs).decode(_coconut_encoding)
 
-version = "0.3.3-dev"
+version = "0.3.3-post_dev"
 
 import functools
 import operator

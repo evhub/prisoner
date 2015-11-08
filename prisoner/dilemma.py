@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# Compiled with Coconut version 0.3.3-dev [Lauric]
+# Compiled with Coconut version 0.3.3-post_dev [Lauric]
 
 # Coconut Header: --------------------------------------------------------------
 
@@ -39,9 +39,6 @@ import __coconut__
 
 __coconut_version__ = __coconut__.version
 reduce = __coconut__.functools.reduce
-itemgetter = __coconut__.operator.itemgetter
-attrgetter = __coconut__.operator.attrgetter
-methodcaller = __coconut__.operator.methodcaller
 takewhile = __coconut__.itertools.takewhile
 dropwhile = __coconut__.itertools.dropwhile
 tee = __coconut__.itertools.tee
@@ -183,7 +180,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         raise ValueError("rounds must be > 0")
 
 def score_sort(scores):
-    return (__coconut__.functools.partial(sorted, key=itemgetter(1)))(scores.items())
+    return (__coconut__.functools.partial(sorted, key=lambda p: p[1]))(scores.items())
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if debug > 0:

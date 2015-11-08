@@ -135,7 +135,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         raise ValueError("rounds must be > 0")
 
 def score_sort(scores):
-    return scores.items() |> sorted$(key=itemgetter(1))
+    return scores.items() |> sorted$(key=(p)->p[1])
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if debug > 0:
