@@ -49,9 +49,10 @@ len = len
 isinstance = isinstance
 getattr = getattr
 slice = slice
+ascii = ascii
 
 def recursive(func):
-    """Tail recursion optimizer."""
+    """Returns tail-call-optimized function."""
     state = [True, None] # toplevel, (args, kwargs)
     recurse = object()
     @functools.wraps(func)
@@ -73,6 +74,10 @@ def recursive(func):
             state[1] = args, kwargs
             return recurse
     return tailed_func
+
+def datamaker(cls):
+    """Returns base data constructor."""
+    return functools.partial(super(cls, cls).__new__, cls)
 
 class MatchError(Exception):
     """Pattern-matching error."""

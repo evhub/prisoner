@@ -43,6 +43,7 @@ takewhile = __coconut__.itertools.takewhile
 dropwhile = __coconut__.itertools.dropwhile
 tee = __coconut__.itertools.tee
 recursive = __coconut__.recursive
+datamaker = __coconut__.datamaker
 MatchError = __coconut__.MatchError
 
 # Compiled Coconut: ------------------------------------------------------------
