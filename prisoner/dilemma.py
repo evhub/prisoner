@@ -170,7 +170,7 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         for a, b in itertools.permutations(participants.keys(), 2):
             if debug > 0:
                 print("\n-- " + a + " vs. " + b + " --")
-            a_score, b_score = next(__coconut__.itertools.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), rounds - 1, (rounds - 1) + 1))
+            a_score, b_score = (lambda i: __coconut__.itertools.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug - 1), i, i + 1)))(rounds - 1)
             scores[a] += (a_score)
             scores[b] += (b_score)
             if debug > 0:
