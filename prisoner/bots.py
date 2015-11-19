@@ -104,9 +104,9 @@ mean_switcher_bot = pd_bot(switcher)
 nice_switcher_bot = mean_switcher_bot + cooperate_bot
 
 def exploiter(self_hist, opp_hist, opp_bot):
-    if (lambda i: __coconut__.itertools.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), i, i + 1)))(1)[1]:
+    if next(__coconut__.itertools.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), 1, (1) + 1))[1]:
         return defect()
-    elif not (lambda i: __coconut__.itertools.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), i, i + 1)))(1)[1]:
+    elif not next(__coconut__.itertools.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), 1, (1) + 1))[1]:
         return defect()
     else:
         return None
@@ -153,9 +153,9 @@ delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) 
 
 def lookahead_or_tft(self_hist, opp_hist, opp_bot):
     c_response, d_response = simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
-    if (lambda i: __coconut__.itertools.islice(d_response, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(d_response, i, i + 1)))(1):
+    if next(__coconut__.itertools.islice(d_response, 1, (1) + 1)):
         return defect()
-    elif (lambda i: __coconut__.itertools.islice(c_response, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(c_response, i, i + 1)))(1):
+    elif next(__coconut__.itertools.islice(c_response, 1, (1) + 1)):
         return cooperate()
     else:
         return defect()
@@ -163,14 +163,14 @@ lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
-    c_scores = (lambda i: __coconut__.itertools.islice(c_simulation, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(c_simulation, i, i + 1)))(3)
-    d_scores = (lambda i: __coconut__.itertools.islice(d_simulation, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(d_simulation, i, i + 1)))(3)
+    c_scores = next(__coconut__.itertools.islice(c_simulation, 3, (3) + 1))
+    d_scores = next(__coconut__.itertools.islice(d_simulation, 3, (3) + 1))
     return decide(c_scores, d_scores)
 simulate_or_tft_bot = pd_bot(simulate_or_tft) + tft_or_mirror_bot
 
 def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(mirror_or_tft_bot, self_hist, opp_bot, opp_hist)
-    c_scores = (lambda i: __coconut__.itertools.islice(c_simulation, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(c_simulation, i, i + 1)))(3)
-    d_scores = (lambda i: __coconut__.itertools.islice(d_simulation, i.start, i.stop, i.step) if isinstance(i, __coconut__.slice) else next(__coconut__.itertools.islice(d_simulation, i, i + 1)))(3)
+    c_scores = next(__coconut__.itertools.islice(c_simulation, 3, (3) + 1))
+    d_scores = next(__coconut__.itertools.islice(d_simulation, 3, (3) + 1))
     return decide(c_scores, d_scores)
 simulate_or_mirror_bot = pd_bot(simulate_or_mirror) + mirror_or_tft_bot
