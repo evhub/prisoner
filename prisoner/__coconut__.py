@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# __coconut_hash__ = 0x756e0891
+
+# Compiled with Coconut version 0.3.4-post_dev [Macapuno]
+
+"""Built-in Coconut functions."""
+
 # Coconut Header: --------------------------------------------------------------
 
 from __future__ import with_statement, print_function, absolute_import, unicode_literals, division
@@ -28,7 +36,7 @@ if _coconut_sys.version_info < (3,):
         """Python 3 input."""
         return _coconut_input(*args, **kwargs).decode(_coconut_encoding)
 
-version = "0.3.3-post_dev"
+version = "0.3.4-post_dev"
 
 import functools
 import operator
