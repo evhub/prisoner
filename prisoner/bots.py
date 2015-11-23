@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# __coconut_hash__ = 0x490214ad
+# __coconut_hash__ = 0xa7d8140b
 
 # Compiled with Coconut version 0.3.4-post_dev [Macapuno]
 
@@ -54,7 +54,7 @@ MatchError = __coconut__.MatchError
 
 # IMPORTS:
 
-from .dilemma import random, pd_bot, simulate, winnings, decide
+from .dilemma import random, pd_bot, playthrough, simulate, winnings, decide
 
 # BOTS:
 
@@ -107,9 +107,9 @@ mean_switcher_bot = pd_bot(switcher)
 nice_switcher_bot = mean_switcher_bot + cooperate_bot
 
 def exploiter(self_hist, opp_hist, opp_bot):
-    if next(__coconut__.itertools.islice(simulate(defect_bot, self_hist, opp_bot, opp_hist, False), 1, (1) + 1))[1]:
+    if next(__coconut__.itertools.islice(playthrough(defect_bot, self_hist, opp_bot, opp_hist, False), 1, (1) + 1))[1]:
         return defect()
-    elif not next(__coconut__.itertools.islice(simulate(cooperate_bot, self_hist, opp_bot, opp_hist, True), 1, (1) + 1))[1]:
+    elif not next(__coconut__.itertools.islice(playthrough(cooperate_bot, self_hist, opp_bot, opp_hist, True), 1, (1) + 1))[1]:
         return defect()
     else:
         return None
@@ -156,19 +156,33 @@ delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) 
 
 def lookahead_or_tft(self_hist, opp_hist, opp_bot):
     c_response, d_response = simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
-    if next(__coconut__.itertools.islice(d_response, 1, (1) + 1)):
+    _coconut_match_check = False
+    _coconut_match_to = next(__coconut__.itertools.islice(d_response, 1, (1) + 1))[1]
+    d_lookahead = _coconut_match_to
+    if (d_lookahead):
+        _coconut_match_check = True
+    if _coconut_match_check:
+        print("lookahead(a):", d_lookahead)
         return defect()
-    elif next(__coconut__.itertools.islice(c_response, 1, (1) + 1)):
-        return cooperate()
     else:
-        return defect()
+        _coconut_match_check = False
+        _coconut_match_to = next(__coconut__.itertools.islice(c_response, 1, (1) + 1))[1]
+        c_lookahead = _coconut_match_to
+        if (c_lookahead):
+            _coconut_match_check = True
+        if _coconut_match_check:
+            print("lookahead(b):", c_lookahead)
+            return cooperate()
+        else:
+            return defect()
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
     c_scores = next(__coconut__.itertools.islice(c_simulation, 3, (3) + 1))
     d_scores = next(__coconut__.itertools.islice(d_simulation, 3, (3) + 1))
-    return decide(c_scores, d_scores)
+    result = decide(c_scores, d_scores)
+    return result
 simulate_or_tft_bot = pd_bot(simulate_or_tft) + tft_or_mirror_bot
 
 def simulate_or_mirror(self_hist, opp_hist, opp_bot):
