@@ -103,10 +103,8 @@ delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) 
 def lookahead_or_tft(self_hist, opp_hist, opp_bot):
     c_response, d_response = simulate(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
     match d_lookahead in d_response$[1][1] if d_lookahead:
-        print("lookahead(a):", d_lookahead)
         return defect()
     else: match c_lookahead in c_response$[1][1] if c_lookahead:
-        print("lookahead(b):", c_lookahead)
         return cooperate()
     else:
         return defect()

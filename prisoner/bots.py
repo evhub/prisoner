@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# __coconut_hash__ = 0xa7d8140b
+# __coconut_hash__ = 0x9839894
 
 # Compiled with Coconut version 0.3.4-post_dev [Macapuno]
 
@@ -162,7 +162,6 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot):
     if (d_lookahead):
         _coconut_match_check = True
     if _coconut_match_check:
-        print("lookahead(a):", d_lookahead)
         return defect()
     else:
         _coconut_match_check = False
@@ -171,7 +170,6 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot):
         if (c_lookahead):
             _coconut_match_check = True
         if _coconut_match_check:
-            print("lookahead(b):", c_lookahead)
             return cooperate()
         else:
             return defect()
