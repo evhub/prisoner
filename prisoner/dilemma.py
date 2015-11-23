@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# __coconut_hash__ = 0xc0f01ce
+# __coconut_hash__ = 0xec2dc781
 
 # Compiled with Coconut version 0.3.4-post_dev [Macapuno]
 
@@ -93,16 +93,19 @@ class pd_bot(object):
         return out
 
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
-        if not self.running:
-            for func in self.funcs:
-                self.running = True
+        if self.running:
+            raise RuntimeError("recursive call detected")
+        for func in self.funcs:
+            self.running = True
+            try:
                 if time is None:
                     result = func(list(self_hist), list(opp_hist), opp_bot)
                 else:
                     result = time_limit(__coconut__.functools.partial(func, list(self_hist), list(opp_hist), opp_bot), None, time)
+            finally:
                 self.running = False
-                if result is not None:
-                    return (bool)(result)
+            if result is not None:
+                return (bool)(result)
         return self.default
 
 # GAME UTILITIES:
