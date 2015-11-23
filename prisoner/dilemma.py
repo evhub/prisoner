@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-# __coconut_hash__ = 0x8797126c
+# __coconut_hash__ = 0xc0f01ce
 
 # Compiled with Coconut version 0.3.4-post_dev [Macapuno]
 
@@ -68,6 +68,7 @@ default_rounds = around(100)
 # BOT CONSTRUCTOR:
 
 class pd_bot(object):
+    running = False
     default = False
 
     def __init__(self, *funcs):
@@ -76,6 +77,7 @@ class pd_bot(object):
     def copy(self):
         out = pd_bot(*self.funcs)
         out.default = self.default
+        out.running = self.running
         return out
 
     def __iadd__(self, other):
@@ -91,13 +93,16 @@ class pd_bot(object):
         return out
 
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
-        for func in self.funcs:
-            if time is None:
-                result = func(list(self_hist), list(opp_hist), opp_bot)
-            else:
-                result = time_limit(__coconut__.functools.partial(func, list(self_hist), list(opp_hist), opp_bot), None, time)
-            if result is not None:
-                return (bool)(result)
+        if not self.running:
+            for func in self.funcs:
+                self.running = True
+                if time is None:
+                    result = func(list(self_hist), list(opp_hist), opp_bot)
+                else:
+                    result = time_limit(__coconut__.functools.partial(func, list(self_hist), list(opp_hist), opp_bot), None, time)
+                self.running = False
+                if result is not None:
+                    return (bool)(result)
         return self.default
 
 # GAME UTILITIES:
@@ -225,41 +230,13 @@ def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=
 
 # BOT UTILITIES:
 
-global simulating
-simulating = False
-
-def sim_next(g):
-    global simulating
-    if simulating:
-        print("^next")
-        raise RuntimeError("recursive simulation detected")
-    simulating = True
-    result = next(g)
-    simulating = False
-    return result
-
-def sim_game(a, b, a_hist, b_hist):
-    g = game(a, b, a_hist, b_hist, None)
-    while True:
-        yield sim_next(g)
-
-def sim_move(opp_bot, opp_hist, self_hist, self_bot):
-    global simulating
-    if simulating:
-        print("^move")
-        raise RuntimeError("recursive simulation detected")
-    simulating = True
-    move = opp_bot(opp_hist, self_hist, self_bot)
-    simulating = False
-    return move
-
 def playthrough(self_bot, self_hist, opp_bot, opp_hist, self_move, opp_move=None):
-    opp_move = sim_move(opp_bot, opp_hist, self_hist, self_bot)
-    results = __coconut__.itertools.chain.from_iterable((_coconut_lazy_item() for _coconut_lazy_item in (lambda: (_coconut_lazy_item() for _coconut_lazy_item in (lambda: (self_move, opp_move),)), lambda: sim_game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move]))))
+    opp_move = opp_bot(opp_hist, self_hist, self_bot)
+    results = __coconut__.itertools.chain.from_iterable((_coconut_lazy_item() for _coconut_lazy_item in (lambda: (_coconut_lazy_item() for _coconut_lazy_item in (lambda: (self_move, opp_move),)), lambda: game(self_bot, opp_bot, self_hist + [self_move], opp_hist + [opp_move]))))
     return results
 
 def simulate(self_bot, self_hist, opp_bot, opp_hist):
-    opp_move = sim_move(opp_bot, opp_hist, self_hist, self_bot)
+    opp_move = opp_bot(opp_hist, self_hist, self_bot)
     return (playthrough(self_bot, self_hist, opp_bot, opp_hist, True, opp_move), playthrough(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, payoffs=default_payoffs):
