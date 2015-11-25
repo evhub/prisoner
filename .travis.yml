@@ -8,9 +8,10 @@ python:
 
 install:
   - git clone https://github.com/evhub/coconut.git
+  - pip install ./coconut
 
 script:
-  - coconut/coconut prisoner
+  - coconut prisoner
   - python prisoner
 
 notifications:
