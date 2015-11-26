@@ -122,9 +122,12 @@ def score_game(moveiter, payoffs=default_payoffs):
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
     return game(a, b, a_hist, b_hist, time, debug) |> score_game$(payoffs=payoffs)
 
+def advance(moveiter):
+    next(moveiter)
+    return moveiter
+
 def until_about(moveiter, rounds=default_rounds):
-    moves = takewhile(lambda _: random.random() < 1/rounds, moveiter) |> list
-    return len(moves), moves
+    return dropwhile(lambda _: random.random() > 1/rounds, moveiter |> enumerate |> advance) |> next
 
 def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     n, (con_score, opp_score) = until_about(tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug), rounds)
