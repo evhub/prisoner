@@ -40,14 +40,13 @@ random_bots = {
     "delayed_tft_or_mirror": bots.delayed_tft_or_mirror_bot
 }
 
-
 main_bots = base_bots.copy()
 main_bots.update(random_bots)
 
 # MAIN:
 
-def main(bots):
-    results = dilemma.winners(bots, time=1, debug=2)
+def main(main_bots):
+    results = dilemma.winners(main_bots, time=1, debug=2)
     print("\n\n==== WINNERS ====\n")
     for winner in results |> reversed:
         print("    "+winner)

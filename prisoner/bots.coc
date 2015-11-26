@@ -55,7 +55,7 @@ nice_switcher_bot = mean_switcher_bot + cooperate_bot
 def exploiter(self_hist, opp_hist, opp_bot):
     if playthrough(defect_bot, self_hist, opp_bot, opp_hist, False)$[1][1]:
         return defect()
-    elif not playthrough(cooperate_bot, self_hist, opp_bot, opp_hist, True)$[1][1]:
+    elif playthrough(cooperate_bot, self_hist, opp_bot, opp_hist, True)$[1][1]:
         return defect()
     else:
         return None
@@ -111,12 +111,12 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot):
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
-    c_simulation, d_simulation = winnings(tft_or_mirror_bot, self_hist, opp_bot, opp_hist)
+    c_simulation, d_simulation = winnings(tit_for_tat_bot, self_hist, opp_bot, opp_hist)
     c_scores = c_simulation$[3]
     d_scores = d_simulation$[3]
     result = decide(c_scores, d_scores)
     return result
-simulate_or_tft_bot = pd_bot(simulate_or_tft) + tft_or_mirror_bot
+simulate_or_tft_bot = pd_bot(simulate_or_tft) + tit_for_tat_bot
 
 def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     c_simulation, d_simulation = winnings(mirror_or_tft_bot, self_hist, opp_bot, opp_hist)
@@ -124,3 +124,10 @@ def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     d_scores = d_simulation$[3]
     return decide(c_scores, d_scores)
 simulate_or_mirror_bot = pd_bot(simulate_or_mirror) + mirror_or_tft_bot
+
+def true_simulate(self_hist, opp_hist, opp_bot):
+    c_simulation, d_simulation = winnings(true_simulate_bot, self_hist, opp_bot, opp_hist)
+    c_scores = c_simulation$[3]
+    d_scores = d_simulation$[3]
+    return decide(c_scores, d_scores)
+true_simulate_bot = pd_bot(true_simulate) + tit_for_tat_bot

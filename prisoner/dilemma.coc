@@ -98,7 +98,7 @@ def game(a, b, a_hist=None, b_hist=None, time=None, debug=0):
         a_c, b_c = moves(a, b, a_hist, b_hist, time)
         a_hist.append(a_c)
         b_hist.append(b_c)
-        if debug > 0:
+        if debug >= 3:
             print("    "+str(a_c)+" "*(a_c+1)+str(b_c))
         yield a_c, b_c
 
@@ -124,18 +124,41 @@ def score_game(moveiter, payoffs=default_payoffs):
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
     return game(a, b, a_hist, b_hist, time, debug) |> score_game$(payoffs=payoffs)
 
+def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+    con_score, opp_score = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug)$[rounds-1]
+    if debug >= 2:
+        print("    contestant: "+str(con_score))
+        print("    opponent: "+str(opp_score))
+    return con_score, opp_score
+
+def battle(contestant, opponents, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
+    if rounds > 0:
+        cum_con_score = 0
+        cum_opp_score = 0
+        for name, opp in opponents.items():
+            if debug >= 1:
+                print("\n-- contestant vs. "+name+" --")
+            con_score, opp_score = fight(contestant, opp, time=time, rounds=rounds, payoffs=payoffs, debug=debug)
+        if debug >= 0:
+            print("\n\n==== FINAL SCORES ====")
+            print("    contestant: "+str(cum_con_score))
+            print("    opponents: "+str(cum_opp_score))
+        return cum_con_score, cum_opp_score
+    else:
+        raise ValueError("rounds must be > 0")
+
 def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if rounds > 0:
         scores = {}
         for participant in participants:
             scores[participant] = 0
-        for a,b in itertools.permutations(participants.keys(), 2):
-            if debug > 0:
+        for a,b in itertools.combinations(participants.keys(), 2):
+            if debug >= 2:
                 print("\n-- "+a+" vs. "+b+" --")
-            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug-1)$[rounds-1]
+            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug)$[rounds-1]
             scores[a] += a_score
             scores[b] += b_score
-            if debug > 0:
+            if debug >= 2:
                 print("    "+a+": "+str(a_score))
                 print("    "+b+": "+str(b_score))
         return scores
@@ -146,15 +169,15 @@ def score_sort(scores):
     return scores.items() |> sorted$(key=(p)->p[1])
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
-    if debug > 0:
+    if debug >= 1:
         count = 0
     while len(participants) > 1:
         if not isinstance(rounds, int):
             rounds = rounds()
-        if debug > 0:
+        if debug >= 1:
             count += 1
             print("\n\n==== ROUND "+str(count)+" ====")
-        scores = round_robin(participants, time, rounds, payoffs, debug-1)
+        scores = round_robin(participants, time, rounds, payoffs, debug)
         yield scores
         participants = participants.copy()
         lowest = None
@@ -173,9 +196,9 @@ def score_repr(scores):
 
 def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     count = 0
-    for scores in tournament(participants, time, rounds, payoffs, debug-1):
+    for scores in tournament(participants, time, rounds, payoffs, debug):
         count += 1
-        if debug > 0:
+        if debug >= 0:
             print("\nROUND "+str(count)+" RESULTS:\n"+score_repr(scores))
         if limit is not None and count >= limit:
             break
