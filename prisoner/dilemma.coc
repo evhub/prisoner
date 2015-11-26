@@ -7,8 +7,8 @@ import random
 # DEFAULTS:
 
 default_payoffs = (
-                  (2,2), (0,3),
-                  (3,0), (1,1)
+                  (1,1), (-1,2),
+                  (2,-1), (0,0)
                   )
 default_rounds = 100
 
