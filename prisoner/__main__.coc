@@ -53,4 +53,4 @@ def main(main_bots):
         print("    "+winner)
 
 if __name__ == "__main__":
-    main(base_bots)
+    main(all_bots)
