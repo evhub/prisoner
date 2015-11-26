@@ -29,7 +29,7 @@ def my_bot_name(self_hist, opp_hist, opp_bot):
 
 Next, in place of `<code>`, insert whatever Python code you want that returns either `True` for cooperate or `False` for defect. To do this, you have use of the arguments `self_hist` (a list containing all your previous moves), `opp_hist` (a list containing all your opponent's previous moves), and `opp_bot` (your opponent's bot function).
 
-All bot functions will be timed out after 1 second and `False` assumed if nothing has been returned. To prevent this, bots may be added together, and if the first bot times out the second bot will be used instead.
+All bot functions will be timed out in the case of infinite recursion and `False` assumed if nothing has been returned. To prevent this, bots may be added together, and if the first bot times out the second bot will be used instead.
 
 ## Examples
 
