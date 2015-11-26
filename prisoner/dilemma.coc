@@ -129,12 +129,12 @@ def advance(moveiter, n=1):
 
 def until_about(moveiter, rounds=default_rounds, deterministic=True):
     if deterministic:
-        return rounds, moveiter$[rounds]
+        return rounds, moveiter$[rounds - 1]
     else:
         return dropwhile(lambda _: random.random() > 1/rounds, moveiter |> enumerate |> advance) |> next
 
 def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
-    n, (con_score, opp_score) = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug) |> until_about(rounds=rounds, deterministic=deterministic)
+    n, (con_score, opp_score) = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug) |> until_about$(rounds=rounds, deterministic=deterministic)
     if debug > 2:
         print("    contestant: "+str(con_score))
         print("    opponent: "+str(opp_score))
