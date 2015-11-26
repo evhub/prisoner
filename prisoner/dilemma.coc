@@ -1,8 +1,8 @@
 # IMPORTS:
 
 import itertools
-import random
 import threading
+import random
 
 # DEFAULTS:
 
@@ -10,9 +10,7 @@ default_payoffs = (
                   (2,2), (0,3),
                   (3,0), (1,1)
                   )
-
-def around(n) = int(random.gauss(n, n/10))
-default_rounds = around(100)
+default_rounds = 100
 
 # BOT CONSTRUCTOR:
 
@@ -124,26 +122,36 @@ def score_game(moveiter, payoffs=default_payoffs):
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
     return game(a, b, a_hist, b_hist, time, debug) |> score_game$(payoffs=payoffs)
 
+def until_about(moveiter, rounds=default_rounds):
+    moves = takewhile(lambda _: random.random() < 1/rounds, moveiter) |> list
+    return len(moves), moves
+
 def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
-    con_score, opp_score = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug)$[rounds-1]
+    n, (con_score, opp_score) = until_about(tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug), rounds)
     if debug > 2:
         print("    contestant: "+str(con_score))
         print("    opponent: "+str(opp_score))
-    return con_score, opp_score
+        print("    (rounds: "+str(n)+")")
+    return n, con_score, opp_score
 
 def battle(contestant, opponents, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if rounds > 0:
+        cum_n = 0
         cum_con_score = 0
         cum_opp_score = 0
         for name, opp in opponents.items():
             if debug > 1:
                 print("\n-- contestant vs. "+name+" --")
-            con_score, opp_score = fight(contestant, opp, time=time, rounds=rounds, payoffs=payoffs, debug=debug)
+            n, con_score, opp_score = fight(contestant, opp, time=time, rounds=rounds, payoffs=payoffs, debug=debug)
+            cum_n += n
+            cum_con_score += con_score
+            cum_opp_score += opp_score
         if debug > 0:
             print("\n\n==== FINAL SCORES ====")
             print("    contestant: "+str(cum_con_score))
             print("    opponents: "+str(cum_opp_score))
-        return cum_con_score, cum_opp_score
+            print("    (rounds: "+str(cum_n)+")")
+        return cum_con_score/cum_n, cum_opp_score/cum_n
     else:
         raise ValueError("rounds must be > 0")
 
@@ -151,29 +159,30 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
     if rounds > 0:
         scores = {}
         for participant in participants:
-            scores[participant] = 0
+            scores[participant] = [0, 0] # [score, n]
         for a,b in itertools.combinations(participants.keys(), 2):
             if debug > 2:
                 print("\n-- "+a+" vs. "+b+" --")
-            a_score, b_score = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug)$[rounds-1]
-            scores[a] += a_score
-            scores[b] += b_score
+            n, (a_score, b_score) = until_about(tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug), rounds)
+            scores[a][0] += a_score
+            scores[a][1] += n
+            scores[b][0] += b_score
+            scores[b][1] += n
             if debug > 2:
                 print("    "+a+": "+str(a_score))
                 print("    "+b+": "+str(b_score))
+                print("    (rounds: "+str(n)+")")
         return scores
     else:
         raise ValueError("rounds must be > 0")
 
 def score_sort(scores):
-    return scores.items() |> sorted$(key=(p)->p[1])
+    return scores.items() |> map$((kv)->(kv[0], kv[1][0]/kv[1][1])) |> sorted$(key=(kv)->kv[1])
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, debug=0):
     if debug > 1:
         count = 0
     while len(participants) > 1:
-        if not isinstance(rounds, int):
-            rounds = rounds()
         if debug > 1:
             count += 1
             print("\n\n==== ROUND "+str(count)+" ====")
