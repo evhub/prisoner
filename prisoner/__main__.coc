@@ -28,7 +28,8 @@ base_bots = {
     "simulate_or_tft": bots.simulate_or_tft_bot,
     "simulate_or_mirror": bots.simulate_or_mirror_bot,
     "lookahead_or_tft": bots.lookahead_or_tft_bot,
-    "true_simulate": bots.true_simulate_bot
+    "true_simulate_or_tft": bots.true_simulate_or_tft_bot,
+    "true_simulate_or_simulate_or_tft": bots.true_simulate_or_simulate_or_tft_bot
 }
 
 random_bots = {

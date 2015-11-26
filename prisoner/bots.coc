@@ -125,9 +125,16 @@ def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     return decide(c_scores, d_scores)
 simulate_or_mirror_bot = pd_bot(simulate_or_mirror) + mirror_or_tft_bot
 
-def true_simulate(self_hist, opp_hist, opp_bot):
-    c_simulation, d_simulation = winnings(true_simulate_bot, self_hist, opp_bot, opp_hist)
+def true_simulate_or_tft(self_hist, opp_hist, opp_bot):
+    c_simulation, d_simulation = winnings(true_simulate_or_tft_bot, self_hist, opp_bot, opp_hist)
     c_scores = c_simulation$[3]
     d_scores = d_simulation$[3]
     return decide(c_scores, d_scores)
-true_simulate_bot = pd_bot(true_simulate) + tit_for_tat_bot
+true_simulate_or_tft_bot = pd_bot(true_simulate_or_tft) + tit_for_tat_bot
+
+def true_simulate_or_simulate_or_tft(self_hist, opp_hist, opp_bot):
+    c_simulation, d_simulation = winnings(true_simulate_or_simulate_or_tft_bot, self_hist, opp_bot, opp_hist)
+    c_scores = c_simulation$[3]
+    d_scores = d_simulation$[3]
+    return decide(c_scores, d_scores)
+true_simulate_or_simulate_or_tft_bot = pd_bot(true_simulate_or_simulate_or_tft) + simulate_or_tft_bot
