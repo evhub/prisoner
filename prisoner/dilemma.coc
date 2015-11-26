@@ -211,13 +211,13 @@ def playthrough(self_bot, self_hist, opp_bot, opp_hist, self_move, opp_move=None
     results = (| (self_move, opp_move) |) :: game(self_bot, opp_bot, self_hist+[self_move], opp_hist+[opp_move])
     return results
 
-def simulate(self_bot, self_hist, opp_bot, opp_hist):
+def simulation(self_bot, self_hist, opp_bot, opp_hist):
     opp_move = opp_bot(opp_hist, self_hist, self_bot)
     return (playthrough(self_bot, self_hist, opp_bot, opp_hist, True, opp_move),
             playthrough(self_bot, self_hist, opp_bot, opp_hist, False, opp_move))
 
 def winnings(self_bot, self_hist, opp_bot, opp_hist, payoffs=default_payoffs):
-    simulation = simulate(self_bot, self_hist, opp_bot, opp_hist)
+    simulation = simulation(self_bot, self_hist, opp_bot, opp_hist)
     return (score_game(simulation[0], payoffs=payoffs),
             score_game(simulation[1], payoffs=payoffs))
 
