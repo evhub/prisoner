@@ -41,8 +41,8 @@ random_bots = {
     "delayed_tft_or_mirror": bots.delayed_tft_or_mirror_bot
 }
 
-main_bots = base_bots.copy()
-main_bots.update(random_bots)
+all_bots = base_bots.copy()
+all_bots.update(random_bots)
 
 # MAIN:
 
@@ -53,4 +53,4 @@ def main(main_bots):
         print("    "+winner)
 
 if __name__ == "__main__":
-    main(main_bots)
+    main(base_bots)
