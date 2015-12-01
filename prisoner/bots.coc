@@ -102,21 +102,27 @@ def delayed_tft_or_mirror(self_hist, opp_hist, opp_bot):
     return mirror(delayed_tft_or_mirror_bot, self_hist, opp_hist, opp_bot)
 delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) + cooperate_bot
 
-def lookahead_or_tft(self_hist, opp_hist, opp_bot):
-    c_response, d_response = simulation(lookahead_or_tft_bot, self_hist, opp_bot, opp_hist)
-    if d_response$[1][1]:
-        return defect()
-    elif c_response$[1][1]:
-        return cooperate()
+def lookahead_or_tft(self_hist, opp_hist, opp_bot, ply=1):
+    if ply == 0:
+        return None
     else:
-        return defect()
+        c_response, d_response = simulation(lookahead_or_tft_bot$(ply=ply-1), self_hist, opp_bot, opp_hist)
+        if d_response$[ply][1]:
+            return defect()
+        elif c_response$[ply][1]:
+            return cooperate()
+        else:
+            return defect()
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=3):
-    c_simulation, d_simulation = winnings(self_bot, self_hist, opp_bot, opp_hist)
-    c_scores = c_simulation$[ply]
-    d_scores = d_simulation$[ply]
-    return decide(c_scores, d_scores)
+    if ply == 0:
+        return None
+    else:
+        c_simulation, d_simulation = winnings(self_bot$(ply=ply-1), self_hist, opp_bot, opp_hist)
+        c_scores = c_simulation$[ply]
+        d_scores = d_simulation$[ply]
+        return decide(c_scores, d_scores)
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
     return simulate(tit_for_tat_bot, self_hist, opp_hist, opp_bot)
