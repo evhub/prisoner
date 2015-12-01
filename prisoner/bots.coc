@@ -106,7 +106,7 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot, ply=1):
     if ply == 0:
         return None
     else:
-        c_response, d_response = simulation(lookahead_or_tft_bot$(ply=ply-1), self_hist, opp_bot, opp_hist)
+        c_response, d_response = simulation(lookahead_or_tft_bot.copy(ply=ply-1), self_hist, opp_bot, opp_hist)
         if d_response$[ply][1]:
             return defect()
         elif c_response$[ply][1]:
@@ -119,7 +119,7 @@ def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=3):
     if ply == 0:
         return None
     else:
-        c_simulation, d_simulation = winnings(self_bot$(ply=ply-1), self_hist, opp_bot, opp_hist)
+        c_simulation, d_simulation = winnings(self_bot.copy(ply=ply-1), self_hist, opp_bot, opp_hist)
         c_scores = c_simulation$[ply]
         d_scores = d_simulation$[ply]
         return decide(c_scores, d_scores)

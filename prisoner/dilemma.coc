@@ -15,17 +15,34 @@ default_rounds = 100
 # BOT CONSTRUCTOR:
 
 class pd_bot(object):
+    calls = 0
+    failures = 0
+    cooperates = 0
     default = False
-    running = None
 
-    def __init__(self, *funcs):
+    def __init__(self, *funcs, **kwargs):
         self.funcs = funcs |> tuple
+        self.state = kwargs
+        self.fought = []
 
-    def copy(self):
-        out = pd_bot(*self.funcs)
+    def copy(self, **kwargs):
+        out = pd_bot(*self.funcs, **kwargs)
+        out.calls = self.calls
+        out.failures = self.failures
+        out.cooperates = self.cooperates
         out.default = self.default
-        out.running = self.running
+        if self.state == out.kwargs:
+            out.fought += self.fought
         return out
+
+    def fail_prob(self):
+        return self.failures / self.calls
+
+    def coop_prob(self):
+        return self.cooperates / (self.calls - self.failures)
+
+    def stats(self):
+        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", calls = "+str(self.calls)+")"
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -39,20 +56,25 @@ class pd_bot(object):
         out += other
         return out
 
-    def __call__(self, self_hist, opp_hist, opp_bot, time=None, **kwargs):
-        if self.running == kwargs:
+    def __call__(self, self_hist, opp_hist, opp_bot, time=None):
+        self.calls += 1
+        if opp_bot in self.fought:
+            self.failures += 1
             raise RuntimeError("recursive call detected")
         for func in self.funcs:
-            self.running = kwargs
+            self.fought.append(opp_bot)
             try:
                 if time is None:
-                    result = func(list(self_hist), list(opp_hist), opp_bot, **kwargs)
+                    result = func(list(self_hist), list(opp_hist), opp_bot)
                 else:
-                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot, **kwargs), None, time)
+                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot), None, time)
             finally:
-                self.running = None
+                self.fought.remove(opp_bot)
             if result is not None:
-                return result |> bool
+                result |>= bool
+                if result:
+                    self.cooperates += 1
+                return result
         return self.default
 
 # GAME UTILITIES:
@@ -211,6 +233,13 @@ def score_repr(scores):
     out = ["{"]
     for name, score in scores |> score_sort |> reversed:
         out.append("    "+name+": "+str(score))
+    out.append("}")
+    return "\n".join(out)
+
+def botstats(participants):
+    out = ["{"]
+    for name, bot in participants.items():
+        out.append("    "+name+": "+bot.stats())
     out.append("}")
     return "\n".join(out)
 

@@ -52,6 +52,8 @@ def main(main_bots):
     print("\n\n==== WINNERS ====\n")
     for winner in results |> reversed:
         print("    "+winner)
+    print("\n= STATS =")
+    print(dilemma.botstats(main_bots))
 
 if __name__ == "__main__":
     main(all_bots)
