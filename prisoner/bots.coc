@@ -153,3 +153,4 @@ def piecewise_mirror(self_hist, opp_hist, opp_bot):
         return mirror(piecewise_mirror_bot, self_hist, opp_hist, opp_bot)
 piecewise_mirror_bot = pd_bot(piecewise_mirror) + punisher_bot
 piecewise_simulate_bot = pd_bot(piecewise_mirror) + simulate_or_punish_bot
+piecewise_lookahead_bot = pd_bot(piecewise_mirror) + lookahead_or_punish_bot
