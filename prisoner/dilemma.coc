@@ -273,7 +273,7 @@ def simulation(self_bot, self_hist, opp_hist, opp_bot):
             playthrough(self_bot, self_hist, opp_hist, opp_bot, DEFECT, opp_move))
 
 def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scalar=1/default_rounds):
-    simulated = simulation(self_bot, self_hist, opp_bot, opp_hist)
+    simulated = simulation(self_bot, self_hist, opp_hist, opp_bot)
     return (score_game(simulated[0], payoffs, scalar),
             score_game(simulated[1], payoffs, scalar))
 
