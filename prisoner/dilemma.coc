@@ -22,20 +22,21 @@ class pd_bot(object):
     _calls = 0
     _failures = 1
     _cooperates = 2
-    _defaults = 3
+    _defers = 3
+    _passes = 4
     default = False
 
     def __init__(self, *funcs, **kwargs):
         self.funcs = funcs |> tuple
         self.state = kwargs
         self.fought = []
-        self.stats = [0, 0, 0, 0] # [calls, failures, cooperates, defaults]
+        self.stats = [0, 0, 0, 0, 0] # [calls, failures, cooperates, defers, passes]
 
     def copy(self, **kwargs):
         out = pd_bot(*self.funcs, **kwargs)
         out.stats = self.stats
         if self.state == out.state:
-            out.fought += self.fought
+            out.fought = self.fought
         return out
 
     def fail_prob(self):
@@ -45,10 +46,17 @@ class pd_bot(object):
         return self.stats[self._cooperates] / (self.stats[self._calls] - self.stats[self._failures])
 
     def defer_prob(self):
-        return self.stats[self._defaults] / (self.stats[self._calls] - self.stats[self._failures])
+        return self.stats[self._defers] / (self.stats[self._calls] - self.stats[self._failures])
+
+    def ave_passes(self):
+        return self.stats[self._passes] / (self.stats[self._calls] - self.stats[self._failures])
 
     def statstr(self):
-        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", defer_prob = "+str(self.defer_prob())+", calls = "+str(self.stats[self._calls])+")"
+        return ("(fail_prob = " + str(self.fail_prob())
+                +", coop_prob = " + str(self.coop_prob())
+                +", defer_prob = " + str(self.defer_prob())
+                +", ave_passes = " + str(self.ave_passes())
+                +", calls = " + str(self.stats[self._calls])+")")
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -76,12 +84,14 @@ class pd_bot(object):
                     result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot, **self.state), None, time)
             finally:
                 self.fought.remove(opp_bot)
-            if result is not DEFER:
+            if result is DEFER:
+                self.stats[self._passes] += 1
+            else:
                 result |>= bool
                 if result:
                     self.stats[self._cooperates] += 1
                 return result
-        self.stats[self._defaults] += 1
+        self.stats[self._defers] += 1
         return self.default
 
 # GAME UTILITIES:
