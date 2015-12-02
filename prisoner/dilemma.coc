@@ -19,38 +19,37 @@ DEFER = None
 # BOT CONSTRUCTOR:
 
 class pd_bot(object):
-    calls = 0
-    failures = 0
-    cooperates = 0
-    defaults = 0
+    _calls = 0
+    _failures = 1
+    _cooperates = 2
+    _defaults = 3
     default = False
 
     def __init__(self, *funcs, **kwargs):
         self.funcs = funcs |> tuple
         self.state = kwargs
         self.fought = []
+        self.stats = [0, 0, 0, 0] # [calls, failures, cooperates, defaults]
 
     def copy(self, **kwargs):
         out = pd_bot(*self.funcs, **kwargs)
-        out.calls = self.calls
-        out.failures = self.failures
-        out.cooperates = self.cooperates
+        out.stats = self.stats
         out.default = self.default
         if self.state == out.state:
             out.fought += self.fought
         return out
 
     def fail_prob(self):
-        return self.failures / self.calls
+        return self.stats[self._failures] / self.stats[self._calls]
 
     def coop_prob(self):
-        return self.cooperates / (self.calls - self.failures)
+        return self.stats[self._cooperates] / (self.stats[self._calls] - self.stats[self._failures])
 
     def def_prob(self):
-        return self.defaults / (self.calls - self.failures)
+        return self.stats[self._defaults] / (self.stats[self._calls] - self.stats[self._failures])
 
-    def stats(self):
-        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", def_prob = "+str(self.def_prob())+", calls = "+str(self.calls)+")"
+    def statstr(self):
+        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", def_prob = "+str(self.def_prob())+", calls = "+str(self.stats[self._calls])+")"
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -65,9 +64,9 @@ class pd_bot(object):
         return out
 
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
-        self.calls += 1
+        self.stats[self._calls] += 1
         if opp_bot in self.fought:
-            self.failures += 1
+            self.stats[self._failures] += 1
             raise RuntimeError("recursive call detected")
         for func in self.funcs:
             self.fought.append(opp_bot)
@@ -81,9 +80,9 @@ class pd_bot(object):
             if result is not DEFER:
                 result |>= bool
                 if result:
-                    self.cooperates += 1
+                    self.stats[self._cooperates] += 1
                 return result
-        self.defaults += 1
+        self.stats[self._defaults] += 1
         return self.default
 
 # GAME UTILITIES:
@@ -248,7 +247,7 @@ def score_repr(scores):
 def botstats(participants):
     out = ["{"]
     for name, bot in participants.items():
-        out.append("    "+name+": "+bot.stats())
+        out.append("    "+name+": "+bot.statstr())
     out.append("}")
     return "\n".join(out)
 
