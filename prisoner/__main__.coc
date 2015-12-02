@@ -48,13 +48,12 @@ all_bots.update(random_bots)
 # MAIN:
 
 def main(main_bots):
-    dilemma.fight(bots.true_simulate_or_tft_bot, bots.mirror_bot, debug=4)
-    #results = dilemma.winners(main_bots, time=1, debug=2)
-    #print("\n\n==== WINNERS ====\n")
-    #for winner in results |> reversed:
-    #    print("    "+winner)
-    #print("\n--- STATS ---\n")
-    #print(dilemma.botstats(main_bots))
+    results = dilemma.winners(main_bots, time=1, debug=2)
+    print("\n\n==== WINNERS ====\n")
+    for winner in results |> reversed:
+        print("    "+winner)
+    print("\n--- STATS ---\n")
+    print(dilemma.botstats(main_bots))
 
 if __name__ == "__main__":
     main(all_bots)
