@@ -66,17 +66,17 @@ class pd_bot(object):
         return self.stats[self._scores] / self.stats[self._calls]
 
     def score(self, n):
-        self.states[self._score] += n
+        self.stats[self._score] += n
         self.stats[self._scores] += 1
 
     def statstr(self):
         return (
-            "\tfail_prob = " + str(self.fail_prob())
+            "\tmain_call_prob = " + str(self.main_call_prob())
+            + "\tave_score = " + str(self.ave_score())
             + "\tcoop_prob = " + str(self.coop_prob())
+            + "\tfail_prob = " + str(self.fail_prob())
             + "\tdefer_prob = " + str(self.defer_prob())
             + "\tave_passes = " + str(self.ave_passes())
-            + "\tmain_call_prob = " + str(self.main_call_prob())
-            + "\tave_score = " + str(self.ave_score())
             + "\tcalls = " + str(self.stats[self._calls])
             )
 
