@@ -18,6 +18,7 @@ class pd_bot(object):
     calls = 0
     failures = 0
     cooperates = 0
+    defaults = 0
     default = False
 
     def __init__(self, *funcs, **kwargs):
@@ -31,7 +32,7 @@ class pd_bot(object):
         out.failures = self.failures
         out.cooperates = self.cooperates
         out.default = self.default
-        if self.state == out.kwargs:
+        if self.state == out.state:
             out.fought += self.fought
         return out
 
@@ -41,8 +42,11 @@ class pd_bot(object):
     def coop_prob(self):
         return self.cooperates / (self.calls - self.failures)
 
+    def def_prob(self):
+        return self.defaults / (self.calls - self.failures)
+
     def stats(self):
-        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", calls = "+str(self.calls)+")"
+        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", def_prob = "+str(self.def_prob())+", calls = "+str(self.calls)+")"
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -65,9 +69,9 @@ class pd_bot(object):
             self.fought.append(opp_bot)
             try:
                 if time is None:
-                    result = func(list(self_hist), list(opp_hist), opp_bot)
+                    result = func(list(self_hist), list(opp_hist), opp_bot, **kwargs)
                 else:
-                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot), None, time)
+                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot, **kwargs), None, time)
             finally:
                 self.fought.remove(opp_bot)
             if result is not None:
@@ -75,6 +79,7 @@ class pd_bot(object):
                 if result:
                     self.cooperates += 1
                 return result
+        self.defaults += 1
         return self.default
 
 # GAME UTILITIES:
