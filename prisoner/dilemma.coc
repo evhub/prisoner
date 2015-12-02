@@ -24,13 +24,21 @@ class pd_bot(object):
     _cooperates = 2
     _defers = 3
     _passes = 4
+    _scores = 5
+    _score = 6
     default = False
 
     def __init__(self, *funcs, **kwargs):
         self.funcs = funcs |> tuple
         self.state = kwargs
         self.fought = []
-        self.stats = [0, 0, 0, 0, 0] # [calls, failures, cooperates, defers, passes]
+        self.stats = [0, # calls
+                      0, # failures
+                      0, # cooperates
+                      0, # defers
+                      0, # passes
+                      0, # scores
+                      0] # score
 
     def copy(self, **kwargs):
         out = pd_bot(*self.funcs, **kwargs)
@@ -51,12 +59,26 @@ class pd_bot(object):
     def ave_passes(self):
         return self.stats[self._passes] / (self.stats[self._calls] - self.stats[self._failures])
 
+    def ave_score(self):
+        return self.stats[self._score] / self.stats[self._scores]
+
+    def main_call_prob(self):
+        return self.stats[self._scores] / self.stats[self._calls]
+
+    def score(self, n):
+        self.states[self._score] += n
+        self.stats[self._scores] += 1
+
     def statstr(self):
-        return ("(fail_prob = " + str(self.fail_prob())
-                +", coop_prob = " + str(self.coop_prob())
-                +", defer_prob = " + str(self.defer_prob())
-                +", ave_passes = " + str(self.ave_passes())
-                +", calls = " + str(self.stats[self._calls])+")")
+        return (
+            "\tfail_prob = " + str(self.fail_prob())
+            + "\tcoop_prob = " + str(self.coop_prob())
+            + "\tdefer_prob = " + str(self.defer_prob())
+            + "\tave_passes = " + str(self.ave_passes())
+            + "\tmain_call_prob = " + str(self.main_call_prob())
+            + "\tave_score = " + str(self.ave_score())
+            + "\tcalls = " + str(self.stats[self._calls])
+            )
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -134,6 +156,9 @@ def game(a, b, a_hist=None, b_hist=None, time=None, debug=0):
         b_hist = list(b_hist)
     while True:
         a_c, b_c = moves(a, b, a_hist, b_hist, time)
+        a_score, b_score = score_move(a_c, b_c)
+        a.score(a_score)
+        b.score(b_score)
         a_hist.append(a_c)
         b_hist.append(b_c)
         if debug > 3:
