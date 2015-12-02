@@ -109,6 +109,7 @@ def time_limit(func, default, time):
     runner.start()
     runner.join(time)
     if runner.isAlive():
+        print("Warning: execution timed out for "+repr(func))
         raise RuntimeError("execution timed out for "+repr(func))
     return store.result
 
