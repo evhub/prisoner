@@ -34,7 +34,6 @@ class pd_bot(object):
     def copy(self, **kwargs):
         out = pd_bot(*self.funcs, **kwargs)
         out.stats = self.stats
-        out.default = self.default
         if self.state == out.state:
             out.fought += self.fought
         return out
@@ -59,7 +58,7 @@ class pd_bot(object):
             raise TypeError("pd_bot objects can only be added to other pd_bot objects, not "+repr(other))
 
     def __add__(self, other):
-        out = self.copy()
+        out = pd_bot(*self.funcs)
         out += other
         return out
 
