@@ -73,9 +73,9 @@ class pd_bot(object):
             self.fought.append(opp_bot)
             try:
                 if time is None:
-                    result = func(list(self_hist), list(opp_hist), opp_bot, **kwargs)
+                    result = func(list(self_hist), list(opp_hist), opp_bot, **self.state)
                 else:
-                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot, **kwargs), None, time)
+                    result = time_limit(func$(list(self_hist), list(opp_hist), opp_bot, **self.state), None, time)
             finally:
                 self.fought.remove(opp_bot)
             if result is not DEFER:
