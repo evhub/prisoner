@@ -154,9 +154,7 @@ def score_game(moveiter, payoffs=default_payoffs, scalar=1):
     b_score = 0
     scale = scalar
     for a_c, b_c in moveiter:
-        a_change, b_change = score_move(a_c, b_c, payoffs)
-        a_change *= scale
-        b_change *= scale
+        a_change, b_change = map((*)$(scale), score_move(a_c, b_c, payoffs))
         a_score += a_change
         b_score += b_change
         yield (a_score, b_score)
@@ -279,10 +277,11 @@ def playthrough(self_bot, self_hist, opp_hist, opp_bot, self_move, opp_move=None
 
 def simulation(self_bot, self_hist, opp_hist, opp_bot):
     opp_move = opp_bot(opp_hist, self_hist, self_bot)
-    return (playthrough(self_bot, self_hist, opp_hist, opp_bot, COOPERATE, opp_move),
-            playthrough(self_bot, self_hist, opp_hist, opp_bot, DEFECT, opp_move))
+    results = (playthrough(self_bot, self_hist, opp_hist, opp_bot, COOPERATE, opp_move),
+        playthrough(self_bot, self_hist, opp_hist, opp_bot, DEFECT, opp_move))
+    return results
 
-def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scalar=1/default_rounds):
+def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scalar=1 - 1/default_rounds):
     simulated = simulation(self_bot, self_hist, opp_hist, opp_bot)
     return (score_game(simulated[0], payoffs, scalar),
             score_game(simulated[1], payoffs, scalar))

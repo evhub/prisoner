@@ -114,6 +114,11 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot):
         return DEFECT
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
+def inspect(testiter, n):
+    out, test = testiter |> tee
+    print(test$[:n] |> list)
+    return out
+
 def simulate(self_bot, self_hist, opp_hist, opp_bot, ply):
     if ply == 0:
         return DEFER
