@@ -45,11 +45,11 @@ class pd_bot(object):
     def coop_prob(self):
         return self.stats[self._cooperates] / (self.stats[self._calls] - self.stats[self._failures])
 
-    def def_prob(self):
+    def defer_prob(self):
         return self.stats[self._defaults] / (self.stats[self._calls] - self.stats[self._failures])
 
     def statstr(self):
-        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", def_prob = "+str(self.def_prob())+", calls = "+str(self.stats[self._calls])+")"
+        return "(fail_prob = "+str(self.fail_prob())+", coop_prob = "+str(self.coop_prob())+", defer_prob = "+str(self.defer_prob())+", calls = "+str(self.stats[self._calls])+")"
 
     def __iadd__(self, other):
         if isinstance(other, pd_bot):
@@ -263,17 +263,17 @@ def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=
 
 # BOT UTILITIES:
 
-def playthrough(self_bot, self_hist, opp_bot, opp_hist, self_move, opp_move=None):
+def playthrough(self_bot, self_hist, opp_hist, opp_bot, self_move, opp_move=None):
     opp_move = opp_bot(opp_hist, self_hist, self_bot)
     results = (| (self_move, opp_move) |) :: game(self_bot, opp_bot, self_hist+[self_move], opp_hist+[opp_move])
     return results
 
-def simulation(self_bot, self_hist, opp_bot, opp_hist):
+def simulation(self_bot, self_hist, opp_hist, opp_bot):
     opp_move = opp_bot(opp_hist, self_hist, self_bot)
-    return (playthrough(self_bot, self_hist, opp_bot, opp_hist, COOPERATE, opp_move),
-            playthrough(self_bot, self_hist, opp_bot, opp_hist, DEFECT, opp_move))
+    return (playthrough(self_bot, self_hist, opp_hist, opp_bot, COOPERATE, opp_move),
+            playthrough(self_bot, self_hist, opp_hist, opp_bot, DEFECT, opp_move))
 
-def winnings(self_bot, self_hist, opp_bot, opp_hist, payoffs=default_payoffs, scalar=1/default_rounds):
+def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scalar=1/default_rounds):
     simulated = simulation(self_bot, self_hist, opp_bot, opp_hist)
     return (score_game(simulated[0], payoffs, scalar),
             score_game(simulated[1], payoffs, scalar))
