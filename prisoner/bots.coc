@@ -1,13 +1,15 @@
 # IMPORTS:
 
-from .dilemma import random, pd_bot, playthrough, simulation, winnings, decide
+from .dilemma import COOPERATE, DEFECT, DEFER, random, pd_bot, playthrough, simulation, winnings, decide
 
 # BOTS:
 
-def cooperate(self_hist=None, opp_hist=None, opp_bot=None) = True
+def defer(self_hist=None, opp_hist=None, opp_bot=None) = DEFER
+
+def cooperate(self_hist=None, opp_hist=None, opp_bot=None) = COOPERATE
 cooperate_bot = pd_bot(cooperate)
 
-def defect(self_hist=None, opp_hist=None, opp_bot=None) = False
+def defect(self_hist=None, opp_hist=None, opp_bot=None) = DEFECT
 defect_bot = pd_bot(defect)
 
 def coin_flip(self_hist=None, opp_hist=None, opp_bot=None):
@@ -18,45 +20,45 @@ def tit_for_tat(self_hist, opp_hist, opp_bot=None):
     if opp_hist:
         return opp_hist[-1]
     else:
-        return None
+        return DEFER
 tit_for_tat_bot = pd_bot(tit_for_tat) + cooperate_bot
 
 def nice_tft(self_hist, opp_hist, opp_bot=None):
     if not opp_hist or opp_hist[-1] or random.random() < .05:
-        return cooperate()
+        return COOPERATE
     else:
-        return defect()
+        return DEFECT
 nice_tft_bot = pd_bot(nice_tft)
 
 def delayed_tft(self_hist, opp_hist, opp_bot=None):
     if opp_hist:
         return random.choice(opp_hist)
     else:
-        return None
+        return DEFER
 delayed_tft_bot = pd_bot(delayed_tft) + cooperate_bot
 
 def punisher(self_hist, opp_hist, opp_bot=None):
     if opp_hist and not all(opp_hist):
-        return defect()
+        return DEFECT
     else:
-        return None
+        return DEFER
 punisher_bot = pd_bot(punisher) + cooperate_bot
 
 def switcher(self_hist, opp_hist, opp_bot=None):
     if not opp_hist or not self_hist:
-        return None
+        return DEFER
     elif self_hist[-1] == opp_hist[-1]:
-        return cooperate()
+        return COOPERATE
     else:
-        return defect()
+        return DEFECT
 mean_switcher_bot = pd_bot(switcher)
 nice_switcher_bot = mean_switcher_bot + cooperate_bot
 
 def exploiter(self_hist, opp_hist, opp_bot):
     if playthrough(defect_bot, self_hist, opp_bot, opp_hist, False)$[1][1]:
-        return defect()
+        return DEFECT
     else:
-        return None
+        return DEFER
 exploit_or_tft_bot = pd_bot(exploiter) + tit_for_tat_bot
 exploit_or_switch_bot = pd_bot(exploiter) + nice_switcher_bot
 exploit_or_punish_bot = pd_bot(exploiter) + punisher_bot
@@ -104,26 +106,31 @@ delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) 
 
 def recursive_tft(self_hist, opp_hist, opp_bot=None, ply=0):
     if ply == 0:
-        return tit_for_tat(self_hist, opp_hist, opp_bot)
+        result = tit_for_tat(self_hist, opp_hist, opp_bot)
+        if result is DEFER:
+            return COOPERATE
+        else:
+            return result
     else:
-        return None
+        return DEFER
+recursive_tft_bot = pd_bot(recursive_tft)
 
 def lookahead_or_tft(self_hist, opp_hist, opp_bot, ply=1):
     if ply == 0:
-        return None
+        return DEFER
     else:
         c_response, d_response = simulation(lookahead_or_tft_bot.copy(ply=ply-1), self_hist, opp_bot, opp_hist)
         if d_response$[ply][1]:
-            return defect()
+            return DEFECT
         elif c_response$[ply][1]:
-            return cooperate()
+            return COOPERATE
         else:
-            return defect()
+            return DEFECT
 lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + recursive_tft_bot
 
 def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=3):
     if ply == 0:
-        return None
+        return DEFER
     else:
         c_simulation, d_simulation = winnings(self_bot.copy(ply=ply-1), self_hist, opp_bot, opp_hist)
         c_scores = c_simulation$[ply]
