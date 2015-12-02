@@ -4,19 +4,19 @@ from .dilemma import COOPERATE, DEFECT, DEFER, random, pd_bot, playthrough, simu
 
 # BOTS:
 
-def defer(self_hist=None, opp_hist=None, opp_bot=None) = DEFER
-
-def cooperate(self_hist=None, opp_hist=None, opp_bot=None) = COOPERATE
+def cooperate(self_hist=None, opp_hist=None, opp_bot=None, ply=0): # supports simulation
+    return COOPERATE
 cooperate_bot = pd_bot(cooperate)
 
-def defect(self_hist=None, opp_hist=None, opp_bot=None) = DEFECT
+def defect(self_hist=None, opp_hist=None, opp_bot=None, ply=0): # supports simulation
+    return DEFECT
 defect_bot = pd_bot(defect)
 
 def coin_flip(self_hist=None, opp_hist=None, opp_bot=None):
     return random.getrandbits(1) |> bool
 coin_flip_bot = pd_bot(coin_flip)
 
-def tit_for_tat(self_hist, opp_hist, opp_bot=None):
+def tit_for_tat(self_hist, opp_hist, opp_bot=None, ply=0): # supports simulation
     if opp_hist:
         return opp_hist[-1]
     else:
@@ -75,7 +75,7 @@ mirror_bot = pd_bot(mirror_or_cooperate) + cooperate_bot
 justice_mirror = mirror$(cooperate_bot)
 justice_mirror_bot = pd_bot(justice_mirror)
 
-def mirror_or_tft(self_hist, opp_hist, opp_bot):
+def mirror_or_tft(self_hist, opp_hist, opp_bot, ply=0): # supports simulation
     return mirror(mirror_or_tft_bot, self_hist, opp_hist, opp_bot)
 mirror_or_tft_bot = pd_bot(mirror_or_tft) + tit_for_tat_bot
 exploit_or_mirror_bot = pd_bot(exploiter) + mirror_or_tft_bot
@@ -104,17 +104,6 @@ def delayed_tft_or_mirror(self_hist, opp_hist, opp_bot):
     return mirror(delayed_tft_or_mirror_bot, self_hist, opp_hist, opp_bot)
 delayed_tft_or_mirror_bot = pd_bot(delayed_tft) + pd_bot(delayed_tft_or_mirror) + cooperate_bot
 
-def recursive_tft(self_hist, opp_hist, opp_bot=None, ply=0):
-    if ply == 0:
-        result = tit_for_tat(self_hist, opp_hist, opp_bot)
-        if result is DEFER:
-            return COOPERATE
-        else:
-            return result
-    else:
-        return DEFER
-recursive_tft_bot = pd_bot(recursive_tft)
-
 def lookahead_or_tft(self_hist, opp_hist, opp_bot, ply=1):
     if ply == 0:
         return DEFER
@@ -126,7 +115,7 @@ def lookahead_or_tft(self_hist, opp_hist, opp_bot, ply=1):
             return COOPERATE
         else:
             return DEFECT
-lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + recursive_tft_bot
+lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=3):
     if ply == 0:
@@ -139,7 +128,7 @@ def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=3):
 
 def simulate_or_tft(self_hist, opp_hist, opp_bot):
     return simulate(tit_for_tat_bot, self_hist, opp_hist, opp_bot)
-simulate_or_tft_bot = pd_bot(simulate_or_tft) + recursive_tft_bot
+simulate_or_tft_bot = pd_bot(simulate_or_tft) + tit_for_tat_bot
 
 def simulate_or_mirror(self_hist, opp_hist, opp_bot):
     return simulate(mirror_or_tft_bot, self_hist, opp_hist, opp_bot)
