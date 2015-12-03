@@ -61,4 +61,4 @@ def main(main_bots):
     print(dilemma.botstats(main_bots))
 
 if __name__ == "__main__":
-    main(main_bots)
+    main(all_bots)
