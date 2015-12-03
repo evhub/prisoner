@@ -125,7 +125,7 @@ def lookahead_or_punish(self_hist, opp_hist, opp_bot):
     return lookahead(punish_or_mirror_bot, self_hist, opp_hist, opp_bot)
 lookahead_or_punish_bot = pd_bot(lookahead_or_punish) + punish_or_mirror_bot
 
-def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=2):
+def simulate(self_bot, self_hist, opp_hist, opp_bot, ply=5):
     if ply == 0:
         return DEFER
     else:
