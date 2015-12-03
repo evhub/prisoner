@@ -47,6 +47,9 @@ class pd_bot(object):
             out.fought = self.fought
         return out
 
+    def __eq__(self, other):
+        return self.funcs == other.funcs and self.state == other.state
+
     def fail_prob(self):
         return self.stats[self._failures] / self.stats[self._calls]
 
