@@ -119,7 +119,7 @@ lookahead_or_tft_bot = pd_bot(lookahead_or_tft) + tit_for_tat_bot
 
 def lookahead_or_mirror(self_hist, opp_hist, opp_bot):
     return lookahead(mirror_or_tft_bot, self_hist, opp_hist, opp_bot)
-lookahead_or_mirror_bot = pd_bot()
+lookahead_or_mirror_bot = pd_bot(lookahead_or_mirror) + mirror_or_tft_bot
 
 def lookahead_or_punish(self_hist, opp_hist, opp_bot):
     return lookahead(punish_or_mirror_bot, self_hist, opp_hist, opp_bot)
