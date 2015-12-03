@@ -277,12 +277,12 @@ def botstats(participants):
     for name, bot in participants |> stat_sort |> reversed:
         out += """
     """+name+":" + (" (Warning: defer_prob = "+str(bot.defer_prob())+")" if bot.defer_prob() else "") + """
-        ave_score = """+str(bots.ave_score())+"""
-        coop_prob = """+str(bots.coop_prob())+"""
-        fail_prob = """+str(bots.fail_prob())+"""
-        ave_passes = """+str(bots.ave_passes())+"""
-        calls = """+str(bots.calls())+"""
-        main_call_prob = """+str(bots.main_call_prob())+"""
+        ave_score = """+str(bot.ave_score())+"""
+        coop_prob = """+str(bot.coop_prob())+"""
+        fail_prob = """+str(bot.fail_prob())+"""
+        ave_passes = """+str(bot.ave_passes())+"""
+        calls = """+str(bot.calls())+"""
+        main_call_prob = """+str(bot.main_call_prob())+"""
 """
     out += "}"
     return out
