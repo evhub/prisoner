@@ -156,7 +156,7 @@ def game(a, b, a_hist=None, b_hist=None, time=None, debug=0):
         b.score(b_score)
         a_hist.append(a_c)
         b_hist.append(b_c)
-        if debug > 3:
+        if debug > 2:
             print("    "+str(a_c)+" "*(a_c+1)+str(b_c))
         yield a_c, b_c
 
@@ -197,7 +197,7 @@ def until_about(moveiter, rounds=default_rounds, deterministic=True):
 
 def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
     n, (con_score, opp_score) = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug) |> until_about$(rounds=rounds, deterministic=deterministic)
-    if debug > 2:
+    if debug > 1:
         print("    contestant: "+str(con_score))
         print("    opponent: "+str(opp_score))
         print("    (rounds: "+str(n)+")")
@@ -230,14 +230,14 @@ def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_
         for participant in participants:
             scores[participant] = [0, 0] # [score, n]
         for a,b in itertools.combinations(participants.keys(), 2):
-            if debug > 2:
+            if debug > 1:
                 print("\n-- "+a+" vs. "+b+" --")
             n, (a_score, b_score) = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug) |> until_about$(rounds=rounds, deterministic=deterministic)
             scores[a][0] += a_score
             scores[a][1] += n
             scores[b][0] += b_score
             scores[b][1] += n
-            if debug > 2:
+            if debug > 1:
                 print("    "+a+": "+str(a_score))
                 print("    "+b+": "+str(b_score))
                 print("    (rounds: "+str(n)+")")
@@ -249,10 +249,10 @@ def score_sort(scores):
     return scores.items() |> map$((kv)->(kv[0], kv[1][0]/kv[1][1])) |> sorted$(key=(kv)->kv[1])
 
 def tournament(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
-    if debug > 1:
+    if debug > 0:
         count = 0
     while len(participants) > 1:
-        if debug > 1:
+        if debug > 0:
             count += 1
             print("\n\n==== ROUND "+str(count)+" ====")
         scores = round_robin(participants, time, rounds, payoffs, deterministic, debug)

@@ -26,6 +26,7 @@ base_bots = {
     "tft_or_mirror": bots.tft_or_mirror_bot,
     "switch_or_mirror": bots.switch_or_mirror_bot,
     "punish_or_mirror": bots.punish_or_mirror_bot,
+    "mirror_or_punish": bots.mirror_or_punish_bot,
     "lookahead_or_tft": bots.lookahead_or_tft_bot,
     "lookahead_or_mirror": bots.lookahead_or_mirror_bot,
     "lookahead_or_punish": bots.lookahead_or_punish_bot,
@@ -53,7 +54,7 @@ all_bots.update(random_bots)
 # MAIN:
 
 def main(main_bots):
-    results = dilemma.winners(main_bots, time=1, debug=2)
+    results = dilemma.winners(main_bots, time=1, debug=1)
     print("\n\n==== WINNERS ====\n")
     for winner in results |> reversed:
         print("    "+winner)
