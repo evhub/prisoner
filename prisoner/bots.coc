@@ -25,10 +25,10 @@ tit_for_tat_bot = pd_bot(tit_for_tat) + cooperate_bot
 
 def nice_tft(self_hist, opp_hist, opp_bot=None):
     if not opp_hist or opp_hist[-1] or random.random() < .05:
-        return COOPERATE
+        return DEFER
     else:
         return DEFECT
-nice_tft_bot = pd_bot(nice_tft)
+nice_tft_bot = pd_bot(nice_tft) + cooperate_bot
 
 def delayed_tft(self_hist, opp_hist, opp_bot=None):
     if opp_hist:
