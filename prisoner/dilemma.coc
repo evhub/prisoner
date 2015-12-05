@@ -20,7 +20,7 @@ DEFER = None
 
 class pd_bot(object):
     _calls = 0
-    _failures = 1
+    _recursions = 1
     _cooperates = 2
     _defers = 3
     _passes = 4
@@ -33,7 +33,7 @@ class pd_bot(object):
         self.state = kwargs
         self.fought = []
         self.stats = [0, # calls
-                      0, # failures
+                      0, # recursions
                       0, # cooperates
                       0, # defers
                       0, # passes
@@ -50,17 +50,17 @@ class pd_bot(object):
     def __eq__(self, other):
         return self.funcs == other.funcs and self.state == other.state
 
-    def fail_prob(self):
-        return self.stats[self._failures] / self.stats[self._calls]
+    def recur_prob(self):
+        return self.stats[self._recursions] / self.stats[self._calls]
 
     def coop_prob(self):
-        return self.stats[self._cooperates] / (self.stats[self._calls] - self.stats[self._failures])
+        return self.stats[self._cooperates] / (self.stats[self._calls] - self.stats[self._recursions])
 
     def defer_prob(self):
-        return self.stats[self._defers] / (self.stats[self._calls] - self.stats[self._failures])
+        return self.stats[self._defers] / (self.stats[self._calls] - self.stats[self._recursions])
 
     def ave_passes(self):
-        return self.stats[self._passes] / (self.stats[self._calls] - self.stats[self._failures])
+        return self.stats[self._passes] / (self.stats[self._calls] - self.stats[self._recursions])
 
     def ave_score(self):
         return self.stats[self._score] / self.stats[self._scores]
@@ -90,7 +90,7 @@ class pd_bot(object):
     def __call__(self, self_hist, opp_hist, opp_bot, time=None):
         self.stats[self._calls] += 1
         if opp_bot in self.fought:
-            self.stats[self._failures] += 1
+            self.stats[self._recursions] += 1
             raise RuntimeError("recursive call detected")
         for func in self.funcs:
             self.fought.append(opp_bot)
@@ -282,7 +282,7 @@ def botstats(participants):
     """+name+":" + (" (Warning: defer_prob = "+str(bot.defer_prob())+")" if bot.defer_prob() else "") + """
         ave_score = """+str(bot.ave_score())+"""
         coop_prob = """+str(bot.coop_prob())+"""
-        fail_prob = """+str(bot.fail_prob())+"""
+        recur_prob = """+str(bot.recur_prob())+"""
         ave_passes = """+str(bot.ave_passes())+"""
         calls = """+str(bot.calls())+"""
         main_call_prob = """+str(bot.main_call_prob())+"""
