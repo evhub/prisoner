@@ -50,6 +50,9 @@ class pd_bot(object):
     def __eq__(self, other):
         return self.funcs == other.funcs and self.state == other.state
 
+    def __ne__(self, other):
+        return not self == other
+
     def recur_prob(self):
         return self.stats[self._recursions] / self.stats[self._calls]
 
