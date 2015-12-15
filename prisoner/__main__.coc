@@ -51,10 +51,9 @@ all_bots.update(random_bots)
 def main(main_bots):
     results = dilemma.winners(main_bots, time=1, debug=1)
     print("\n\n==== WINNERS ====\n")
-    for winner in results |> reversed:
-        print("    "+winner)
+    results |> reversed |> ((winner) -> print("    "+winner)) |> consume
     print("\n--- STATS ---\n")
-    print(dilemma.botstats(main_bots))
+    main_bots |> dilemma.botstats |> print
 
 if __name__ == "__main__":
     main(all_bots)

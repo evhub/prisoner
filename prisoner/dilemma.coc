@@ -307,7 +307,7 @@ def winners(participants, limit=None, time=None, rounds=default_rounds, payoffs=
 
 def playthrough(self_bot, self_hist, opp_hist, opp_bot, self_move, opp_move=None):
     opp_move = opp_bot(opp_hist, self_hist, self_bot)
-    results = (| (self_move, opp_move) |) :: game(self_bot, opp_bot, self_hist+[self_move], opp_hist+[opp_move])
+    results = ( (self_move, opp_move), ) :: game(self_bot, opp_bot, self_hist+[self_move], opp_hist+[opp_move])
     return results
 
 def simulation(self_bot, self_hist, opp_hist, opp_bot):
