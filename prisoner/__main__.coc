@@ -51,7 +51,7 @@ all_bots.update(random_bots)
 def main(main_bots):
     results = dilemma.winners(main_bots, time=1, debug=1)
     print("\n\n==== WINNERS ====\n")
-    results |> reversed |> ((winner) -> print("    "+winner)) |> consume
+    results |> reversed |> map$((winner) -> print("    "+winner)) |> consume
     print("\n--- STATS ---\n")
     main_bots |> dilemma.botstats |> print
 
