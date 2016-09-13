@@ -40,6 +40,10 @@ class pd_bot(object):
                       0, # scores
                       0] # score
 
+    def update(self, other):
+        for i in range(len(self.stats)):
+            self.stats[i] += other.stats[i]
+
     def copy(self, **kwargs):
         out = pd_bot(*self.funcs, **kwargs)
         out.stats = self.stats
@@ -173,30 +177,26 @@ def score_move(a_c, b_c, payoffs=default_payoffs):
     else:
         return payoffs[3]
 
-def score_game(moveiter, payoffs=default_payoffs, scalar=1):
+def score_game(moveiter, payoffs=default_payoffs, scaler=1):
     a_score = 0
     b_score = 0
-    scale = scalar
+    scale = scaler
     for a_c, b_c in moveiter:
         a_change, b_change = map((*)$(scale), score_move(a_c, b_c, payoffs))
         a_score += a_change
         b_score += b_change
         yield (a_score, b_score)
-        scale *= scalar
+        scale *= scaler
 
 def tally(a, b, a_hist=None, b_hist=None, time=None, payoffs=default_payoffs, debug=0):
     return game(a, b, a_hist, b_hist, time, debug) |> score_game$(payoffs=payoffs)
-
-def advance(moveiter, n=1):
-    for i in range(n):
-        next(moveiter)
-    return moveiter
 
 def until_about(moveiter, rounds=default_rounds, deterministic=True):
     if deterministic:
         return rounds, moveiter$[rounds - 1]
     else:
-        return dropwhile((_) -> random.random() > 1/rounds, moveiter |> enumerate |> advance) |> next
+        i, result = moveiter |> enumerate |> dropwhile(-> random.random() > 1/rounds) |> next
+        return i + 1, result
 
 def fight(contestant, opponent, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
     n, (con_score, opp_score) = tally(contestant, opponent, time=time, payoffs=payoffs, debug=debug) |> until_about$(rounds=rounds, deterministic=deterministic)
@@ -227,20 +227,32 @@ def battle(contestant, opponents, time=None, rounds=default_rounds, payoffs=defa
     else:
         raise ValueError("rounds must be > 0")
 
+def single_round(players, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
+    (a, a_bot), (b, b_bot) = players
+    n, (a_score, b_score) = (
+        tally(a_bot, b_bot, time=time, payoffs=payoffs, debug=debug)
+        |> until_about$(rounds=rounds, deterministic=deterministic)
+    )
+    return n, (a, a_bot, a_score), (b, b_bot, b_score)
+
 def round_robin(participants, time=None, rounds=default_rounds, payoffs=default_payoffs, deterministic=True, debug=0):
     if rounds > 0:
         scores = {}
         for participant in participants:
             scores[participant] = [0, 0] # [score, n]
-        for a,b in itertools.combinations(participants.keys(), 2):
-            if debug > 1:
-                print("\n-- "+a+" vs. "+b+" --")
-            n, (a_score, b_score) = tally(participants[a], participants[b], time=time, payoffs=payoffs, debug=debug) |> until_about$(rounds=rounds, deterministic=deterministic)
+        for n, (a, a_bot, a_score), (b, b_bot, b_score) in (
+                itertools.combinations(participants.keys(), 2)
+                |> map$((players) -> players |> map$(-> (_, participants[_])) |> tuple) |> tuple
+                |> parallel_map$(single_round$(time=time, rounds=rounds, payoffs=payoffs, deterministic=deterministic, debug=debug))
+            ):
+            participants[a].update(a_bot)
+            participants[b].update(b_bot)
             scores[a][0] += a_score
             scores[a][1] += n
             scores[b][0] += b_score
             scores[b][1] += n
             if debug > 1:
+                print("\n-- "+a+" vs. "+b+" --")
                 print("    "+a+": "+str(a_score))
                 print("    "+b+": "+str(b_score))
                 print("    (rounds: "+str(n)+")")
@@ -316,10 +328,10 @@ def simulation(self_bot, self_hist, opp_hist, opp_bot):
         playthrough(self_bot, self_hist, opp_hist, opp_bot, DEFECT, opp_move))
     return results
 
-def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scalar=1 - 1/default_rounds):
+def winnings(self_bot, self_hist, opp_hist, opp_bot, payoffs=default_payoffs, scaler=1 - 1/default_rounds):
     simulated = simulation(self_bot, self_hist, opp_hist, opp_bot)
-    return (score_game(simulated[0], payoffs, scalar),
-            score_game(simulated[1], payoffs, scalar))
+    return (score_game(simulated[0], payoffs, scaler),
+            score_game(simulated[1], payoffs, scaler))
 
 def decide(c_scores, d_scores):
     if c_scores[0] > d_scores[0]:
