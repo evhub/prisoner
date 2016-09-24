@@ -1,18 +1,11 @@
 language: python
-
-sudo: false
-
-python:
-  - "2.7"
-  - "3.4"
-
-install:
-  - git clone https://github.com/evhub/coconut.git
-  - pip install ./coconut
-
-script:
-  - coconut prisoner
-  - python prisoner
-
 notifications:
   email: false
+sudo: false
+cache: pippython:
+  - "2.7"
+  - "3.4"
+install:
+  - make setup
+script:
+  - make
