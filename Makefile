@@ -4,7 +4,7 @@ run: build
 
 .PHONY: build
 build:
-    coconut prisoner -fps -j sys
+    coconut prisoner -sf -j sys
 
 .PHONY: setup
 setup:
