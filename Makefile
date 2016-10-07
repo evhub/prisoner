@@ -1,11 +1,11 @@
 .PHONY: run
 run: build
-    python ./prisoner
+	python ./prisoner
 
 .PHONY: build
 build:
-    coconut prisoner -sf -j sys
+	coconut prisoner -sf -j sys
 
 .PHONY: setup
 setup:
-    pip install coconut-develop
+	pip install coconut-develop
