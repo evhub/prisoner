@@ -1,10 +1,13 @@
-.PHONY: run
-run: build
-	python ./prisoner
-
 .PHONY: build
 build:
 	coconut prisoner -sf -j sys
+
+.PHONY: run
+run:
+	python ./prisoner
+
+.PHONY: test
+test: build run
 
 .PHONY: setup
 setup:
