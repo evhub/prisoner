@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	coconut prisoner -sf -j sys
+	coconut prisoner -s -j sys
 
 .PHONY: run
 run:
