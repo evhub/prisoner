@@ -20,7 +20,7 @@ Score is determined as follows:
 ## Instructions
 
 First, create a Python (`.py`) file containing this code:
-```
+```python
 from prisoner.dilemma import *
 
 @pd_bot
@@ -35,28 +35,28 @@ All bot functions will be timed out in the case of infinite recursion and `False
 ## Examples
 
 Cooperate:
-```
+```python
 @pd_bot
 def cooperate_bot(self_hist, opp_hist, opp_bot):
     return True
 ```
 
 Defect:
-```
+```python
 @pd_bot
 def defect_bot(self_hist, opp_hist, opp_bot):
     return False
 ```
 
 Coin Flip:
-```
+```python
 @pd_bot
 def coin_flip_bot(self_hist, opp_hist, opp_bot):
     return random.getrandbits(1)
 ```
 
 Tit for Tat:
-```
+```python
 @pd_bot
 def tit_for_tat_bot(self_hist, opp_hist, opp_bot):
     if opp_hist:
@@ -66,7 +66,7 @@ def tit_for_tat_bot(self_hist, opp_hist, opp_bot):
 ```
 
 Mirror:
-```
+```python
 @pd_bot
 def mirror_bot(self_hist, opp_hist, opp_bot):
     return opp_bot(opp_hist, self_hist, mirror_bot)
