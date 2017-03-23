@@ -8,13 +8,14 @@ A Python prisoner's dilemma competition adjudicator, written in [Coconut](https:
 The goal of the competition is to write a Prisoner's Dilemma bot that survives into the final round. Each round, every bot is pitted against every other bot for approximately (but not usually exactly) 100 rounds, and the bot or bots with the lowest average score among all the games they played that round are eliminated. The game continues until all the bots left are tied.
 
 Score is determined as follows:
+
 - Both cooperate:
- * +1 score for both
+    * +1 score for both
 - Both defect:
- * no change in score
+    * no change in score
 - One cooperates, one defects:
- * Cooperator: -1 score
- * Defector: +2 score
+    * Cooperator: -1 score
+    * Defector: +2 score
 
 ## Instructions
 
