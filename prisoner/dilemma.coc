@@ -18,7 +18,7 @@ DEFER = None
 
 # BOT CONSTRUCTOR:
 
-class pd_bot(object):
+class pd_bot:
     _calls = 0
     _recursions = 1
     _cooperates = 2
