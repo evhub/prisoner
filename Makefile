@@ -12,3 +12,7 @@ test: build run
 .PHONY: setup
 setup:
 	pip install coconut-develop
+
+.PHONY: watch
+watch:
+	coconut prisoner -w -s
